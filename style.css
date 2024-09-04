@@ -21,7 +21,12 @@ body {
 }
 
 h1 {
-  text-align: center
+  text-align: center;
+}
+
+img {
+  display: block;
+  margin: 0 auto;
 }
 
 .switch {
@@ -46,7 +51,8 @@ h1 {
   width: var(--switch-width);
   height: var(--switch-height);
   background-color: var(--bg-off);
-  transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
+  transition: background-color var(--transition-duration),
+    box-shadow var(--transition-duration);
   border-radius: var(--switch-height);
   box-shadow: 0 2px 5px var(--box-shadow-color);
 }
@@ -60,7 +66,8 @@ h1 {
   bottom: 4px;
   background-color: var(--slider-color);
   border-radius: 50%;
-  transition: transform var(--transition-duration), background-color var(--transition-duration);
+  transition: transform var(--transition-duration),
+    background-color var(--transition-duration);
 }
 
 /* Zustand, wenn das Input-Element nicht aktiviert (unchecked) ist */

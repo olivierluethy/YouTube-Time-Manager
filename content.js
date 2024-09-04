@@ -1,49 +1,37 @@
 // Funktion, um YouTube-Videovorschläge, fremde Playlists und die Tablist auszublenden
 function hideYouTubeRecommendations() {
+    // Empfehlungen im Seitenleistenbereich ausblenden
     const recommendationSections = document.querySelectorAll('#secondary #related ytd-compact-video-renderer');
     recommendationSections.forEach(element => {
         element.style.display = 'none';
     });
 
+    // Alle Playlists im Sidebar-Bereich durchgehen
     const playlistSections = document.querySelectorAll('#secondary #items ytd-playlist-panel-renderer');
     playlistSections.forEach(playlist => {
+        // Hier gehen wir sicher, dass nur Playlists angezeigt werden, die vom Benutzer stammen
         const playlistOwner = playlist.querySelector('a.yt-simple-endpoint.style-scope.yt-formatted-string');
-        if (playlistOwner && playlistOwner.textContent !== 'Dein Kanalname') {
+        
+        // Check if the playlist belongs to the user (anpassen an deinen Kanalnamen)
+        if (playlistOwner && playlistOwner.textContent !== 'Dein Kanalname') { 
             playlist.style.display = 'none';
         } else {
             playlist.style.display = 'block';
         }
     });
 
+    // Tablist auf der rechten Seite ausblenden
     const tabList = document.querySelector('ytd-watch-next-secondary-results-renderer');
     if (tabList) {
         tabList.style.display = 'none';
     }
 }
 
-// Funktion, um YouTube-Videovorschläge, fremde Playlists und die Tablist wieder einzublenden
-function showYouTubeRecommendations() {
-    const recommendationSections = document.querySelectorAll('#secondary #related ytd-compact-video-renderer');
-    recommendationSections.forEach(element => {
-        element.style.display = '';
-    });
+// MutationObserver erstellen, um Änderungen im DOM zu beobachten
+const observer = new MutationObserver(hideYouTubeRecommendations);
 
-    const playlistSections = document.querySelectorAll('#secondary #items ytd-playlist-panel-renderer');
-    playlistSections.forEach(playlist => {
-        playlist.style.display = '';
-    });
+// Beobachten der Änderungen im Dokument mit der Konfiguration des Observers
+observer.observe(document.body, { childList: true, subtree: true });
 
-    const tabList = document.querySelector('ytd-watch-next-secondary-results-renderer');
-    if (tabList) {
-        tabList.style.display = '';
-    }
-}
-
-// Lade den anfänglichen Zustand aus dem Speicher und wende ihn an
-chrome.storage.sync.get(['isEnabled'], (result) => {
-    if (result.isEnabled !== false) {
-        hideYouTubeRecommendations();
-    } else {
-        showYouTubeRecommendations();
-    }
-});
+// Die Funktion sofort aufrufen, falls die Elemente bereits vorhanden sind
+hideYouTubeRecommendations();

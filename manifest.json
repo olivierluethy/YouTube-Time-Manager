@@ -1,32 +1,16 @@
 {
     "manifest_version": 3,
-    "name": "YouRecoBlock",
+    "name": "YouRecoHide",
     "version": "1.0",
-    "description": "Hides video recommendations and unwanted playlists on YouTube, while keeping your playlists visible. Includes a toggle to enable or disable the functionality.",
+    "description": "Hides video recommendations on YouTube while keeping playlist videos visible in the sidebar. This extension helps reduce distractions by removing unwanted suggestions without affecting your playlist viewing experience.",
     "permissions": [
-      "activeTab", "storage", "scripting"
+      "activeTab"
     ],
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "icon/icon.png",
-        "48": "icon/icon.png",
-        "128": "icon/icon.png"
-      }
-    },
     "content_scripts": [
       {
-        "matches": ["https://www.youtube.com/*"],
+        "matches": ["<all_urls>"],
         "js": ["content.js"]
       }
-    ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "icons": {
-      "16": "icon/icon.png",
-      "48": "icon/icon.png",
-      "128": "icon/icon.png"
-    }
+    ]
   }
   
