@@ -1,8 +1,10 @@
 # YouRecoHide
 
+<p align="center">
 <img src="icon/icon.png" alt="Logo" width="200" height="200">
+</p>
 
-YouRecoHide is a simple yet effective Chrome extension designed to enhance your focus by hiding YouTube recommendations, playlists from other users, and the tab list while you're watching videos. This ensures that you're not distracted by unrelated content and can maintain your focus on what truly matters.
+YouRecoHide is a simple yet effective Chrome extension that improves your focus by hiding YouTube recommendations, other users' playlists, and the tab list while you're watching videos. This ensures that you're not distracted by unrelated content and can focus on what's important.
 
 ## Features
 
@@ -16,7 +18,7 @@ YouRecoHide is a simple yet effective Chrome extension designed to enhance your 
 
 ### Background Process
 
-The extension operates by injecting a content script into YouTube pages. This script manipulates the DOM to hide specific elements, including recommendations, external playlists, and the tab list. The extension's state (enabled/disabled) is saved in Chrome's sync storage, allowing it to persist across browser sessions and devices.
+The extension works by inserting a content script into YouTube pages. This script manipulates the DOM to hide certain elements, including recommendations, external playlists, and the tab list. The extension's state (enabled/disabled) is stored in Chrome's sync cache, allowing it to persist across browser sessions and devices.
 
 ### User Interface
 
@@ -57,7 +59,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Author
 
-- **Olivier Lüthy** - *Developer and Maintainer*
+- **Olivier Lüthy** - _Developer and Maintainer_
 
 ## Acknowledgements
 

@@ -20,6 +20,10 @@ body {
   color: white;
 }
 
+h1 {
+  text-align: center
+}
+
 .switch {
   position: relative;
   margin-top: 1rem;
