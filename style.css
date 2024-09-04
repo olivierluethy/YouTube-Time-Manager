@@ -1,80 +1,98 @@
 :root {
-    --switch-width: 60px;
-    --switch-height: 34px;
-    --slider-size: 26px;
-    --bg-off: #ccc;
-    --bg-on: #2196f3;
-    --bg-hover: #1e88e5;
-    --focus-color: #42a5f5;
-    --slider-color: #ffffff;
-    --transition-duration: 0.3s;
-    --box-shadow-color: rgba(0, 0, 0, 0.2);
-  }
-  
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: var(--switch-width);
-    height: var(--switch-height);
-  }
-  
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--bg-off);
-    transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
-    border-radius: var(--switch-height);
-    box-shadow: 0 2px 5px var(--box-shadow-color);
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: var(--slider-size);
-    width: var(--slider-size);
-    left: 4px;
-    bottom: 4px;
-    background-color: var(--slider-color);
-    border-radius: 50%;
-    transition: transform var(--transition-duration), background-color var(--transition-duration);
-  }
-  
-  input:checked + .slider {
-    background-color: var(--bg-on);
-  }
-  
-  input:checked + .slider:before {
-    transform: translateX(calc(var(--switch-width) - var(--slider-size) - 8px));
-  }
-  
-  .slider:hover {
-    background-color: var(--bg-hover);
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 0 3px var(--focus-color);
-    outline: none;
-  }
-  
-  input:checked:focus + .slider {
-    box-shadow: 0 0 0 3px var(--focus-color);
-  }
-  
-  .slider.round {
-    border-radius: var(--switch-height);
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
-  
+  --switch-width: 60px;
+  --switch-height: 34px;
+  --slider-size: 26px;
+  --bg-off: #ccc;
+  --bg-on: #2196f3;
+  --bg-hover: #1e88e5;
+  --focus-color: #42a5f5;
+  --slider-color: #ffffff;
+  --transition-duration: 0.5s;
+  --box-shadow-color: rgba(0, 0, 0, 0.2);
+  --label-spacing: 10px;
+  --font-size: 16px;
+  --font-color: white;
+}
+
+body {
+  width: 200px;
+  background-color: black;
+  color: white;
+}
+
+.switch {
+  position: relative;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--label-spacing);
+  font-size: var(--font-size);
+  color: var(--font-color);
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: relative;
+  cursor: pointer;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  background-color: var(--bg-off);
+  transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
+  border-radius: var(--switch-height);
+  box-shadow: 0 2px 5px var(--box-shadow-color);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: var(--slider-size);
+  width: var(--slider-size);
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--slider-color);
+  border-radius: 50%;
+  transition: transform var(--transition-duration), background-color var(--transition-duration);
+}
+
+/* Zustand, wenn das Input-Element nicht aktiviert (unchecked) ist */
+input:not(:checked) + .slider {
+  background-color: var(--bg-off); /* Hintergrundfarbe für den "Off"-Zustand */
+}
+
+input:not(:checked) + .slider:before {
+  transform: translateX(0); /* Slider auf die Ausgangsposition zurücksetzen */
+}
+
+input:checked + .slider {
+  background-color: var(--bg-on);
+}
+
+input:checked + .slider:before {
+  transform: translateX(calc(var(--switch-width) - var(--slider-size) - 8px));
+}
+
+.slider:hover {
+  background-color: orange;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 0 3px var(--focus-color);
+  outline: none;
+}
+
+input:checked:focus + .slider {
+  box-shadow: 0 0 0 3px var(--focus-color);
+}
+
+.slider.round {
+  border-radius: var(--switch-height);
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

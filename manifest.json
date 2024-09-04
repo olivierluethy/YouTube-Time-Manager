@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "YouTube Focus: Hide Recommendations",
+    "name": "YouRecoBlock",
     "version": "1.0",
     "description": "Hides video recommendations and unwanted playlists on YouTube, while keeping your playlists visible. Includes a toggle to enable or disable the functionality.",
     "permissions": [

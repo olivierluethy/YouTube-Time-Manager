@@ -39,9 +39,11 @@ function showYouTubeRecommendations() {
     }
 }
 
-// Load initial state from storage and apply it
+// Lade den anfänglichen Zustand aus dem Speicher und wende ihn an
 chrome.storage.sync.get(['isEnabled'], (result) => {
     if (result.isEnabled !== false) {
         hideYouTubeRecommendations();
+    } else {
+        showYouTubeRecommendations();
     }
 });
