@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "YouRecoHide",
+    "version": "1.0",
+    "description": "Hides video recommendations on YouTube while keeping playlist videos visible in the sidebar. This extension helps reduce distractions by removing unwanted suggestions without affecting your playlist viewing experience.",
+    "permissions": [
+      "activeTab"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
