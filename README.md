@@ -6,7 +6,7 @@
   </a>
 
   <h3 align="center">YouRecoHide</h3>
-  <h4 align="center">Google Chrome Extension to block YouTube Video Recommendations</h4>
+  <h4 align="center">Google Chrome extension to block YouTube video recommendations without affecting the visibility of open playlists</h4>
 
   <p align="center">
     Here I'll explain how I developed the application called YouRecoHide
@@ -97,3 +97,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Acknowledgements
 
 - Special thanks to the Chrome Extensions documentation and various online resources for guidance in developing this extension.
+
+## Disclaimer
+I don't store any of your information. If you don't believe me, all the code is in this repo so you can check it out for yourself. The only data that is stored is on your own computer. This is necessary for Chrome to remember what you chose to hide when you refresh your page.
+YouRecoHide for YouTube is not affiliated with YouTube.

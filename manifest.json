@@ -4,8 +4,17 @@
     "version": "1.0",
     "description": "Hides video recommendations on YouTube while keeping playlist videos visible in the sidebar. This extension helps reduce distractions by removing unwanted suggestions without affecting your playlist viewing experience.",
     "permissions": [
+      "activeTab", "storage", "scripting",
       "activeTab"
     ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "icon/icon.png",
+        "48": "icon/icon.png",
+        "128": "icon/icon.png"
+      }
+    },
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
