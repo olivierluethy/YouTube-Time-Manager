@@ -1,37 +1,64 @@
-// Funktion, um YouTube-Videovorschläge, fremde Playlists und die Tablist auszublenden
-function hideYouTubeRecommendations() {
-    // Empfehlungen im Seitenleistenbereich ausblenden
-    const recommendationSections = document.querySelectorAll('#secondary #related ytd-compact-video-renderer');
-    recommendationSections.forEach(element => {
-        element.style.display = 'none';
-    });
-
-    // Alle Playlists im Sidebar-Bereich durchgehen
-    const playlistSections = document.querySelectorAll('#secondary #items ytd-playlist-panel-renderer');
-    playlistSections.forEach(playlist => {
-        // Hier gehen wir sicher, dass nur Playlists angezeigt werden, die vom Benutzer stammen
-        const playlistOwner = playlist.querySelector('a.yt-simple-endpoint.style-scope.yt-formatted-string');
-        
-        // Check if the playlist belongs to the user (anpassen an deinen Kanalnamen)
-        if (playlistOwner && playlistOwner.textContent !== 'Dein Kanalname') { 
-            playlist.style.display = 'none';
-        } else {
-            playlist.style.display = 'block';
-        }
-    });
-
-    // Tablist auf der rechten Seite ausblenden
-    const tabList = document.querySelector('ytd-watch-next-secondary-results-renderer');
-    if (tabList) {
-        tabList.style.display = 'none';
-    }
+// Funktion, um ein Element anhand eines Selektors auszublenden
+function hideElement(selector) {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.style.display = "none";
+  }
 }
 
-// MutationObserver erstellen, um Änderungen im DOM zu beobachten
-const observer = new MutationObserver(hideYouTubeRecommendations);
+// Funktion, um mehrere Elemente anhand eines Selektors auszublenden
+function hideElements(selector) {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach((element) => {
+    element.style.display = "none";
+  });
+}
 
-// Beobachten der Änderungen im Dokument mit der Konfiguration des Observers
-observer.observe(document.body, { childList: true, subtree: true });
+// Funktion, um fremde Playlists auszublenden, nur eigene werden angezeigt
+function hideForeignPlaylists(userChannelName) {
+  const playlists = document.querySelectorAll(
+    "#secondary #items ytd-playlist-panel-renderer"
+  );
+  playlists.forEach((playlist) => {
+    const playlistOwner = playlist.querySelector(
+      "a.yt-simple-endpoint.style-scope.yt-formatted-string"
+    );
+    playlist.style.display =
+      playlistOwner && playlistOwner.textContent !== userChannelName
+        ? "none"
+        : "block";
+  });
+}
 
-// Die Funktion sofort aufrufen, falls die Elemente bereits vorhanden sind
+// Hauptfunktion, um YouTube-Videovorschläge, Playlists und die Tablist auszublenden
+function hideYouTubeRecommendations() {
+  hideElements("#secondary #related ytd-compact-video-renderer"); // Empfehlungen ausblenden
+  hideForeignPlaylists("Dein Kanalname"); // Fremde Playlists ausblenden
+  hideElement("ytd-watch-next-secondary-results-renderer"); // Tablist ausblenden
+
+// hideElement('.style-scope ytd-page-manager [role="main"]'); // YouTube Feed ausblenden
+  hideElement('.yt-simple-endpoint[title="Shorts"]'); // Shorts ausblenden
+  hideElement('.yt-simple-endpoint[title="Startseite"]'); // Startseite ausblenden
+  hideElement(".style-scope.ytd-guide-renderer:nth-child(3)"); // Entdecken ausblenden
+}
+
+// YouTube-Weiterleitung zur Abonnementseite
+function redirectToSubscriptions() {
+  if (
+    window.location.hostname === "www.youtube.com" &&
+    window.location.pathname === "/"
+  ) {
+    window.location.href = "https://www.youtube.com/feed/subscriptions";
+  }
+}
+
+// Observer zur Beobachtung von DOM-Änderungen einrichten
+function observeDOMChanges(callback) {
+  const observer = new MutationObserver(callback);
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Initialisierung
+redirectToSubscriptions();
+observeDOMChanges(hideYouTubeRecommendations);
 hideYouTubeRecommendations();
