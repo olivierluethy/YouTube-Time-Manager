@@ -1,3 +1,5 @@
+"use strict";
+
 // Funktion, um ein Element anhand eines Selektors auszublenden
 function hideElement(selector) {
   const element = document.querySelector(selector);
@@ -67,9 +69,48 @@ function observeDOMChanges(callback) {
 
 // Initialisierung
 redirectToSubscriptions();
-
 // If you try to enter trends
 cheatingRedirect();
-
 observeDOMChanges(hideYouTubeRecommendations);
 hideYouTubeRecommendations();
+
+// Funktion, um das Element zu verstecken oder anzuzeigen
+function toggleFeed(hideFeed) {
+  const feedElement = document.querySelector(
+    '.style-scope ytd-page-manager [role="main"]'
+  );
+
+  if (feedElement) {
+    feedElement.style.display = hideFeed ? "none" : "block";
+  }
+}
+
+// Funktion zur Initialisierung des MutationObservers
+function observeDOMChanges() {
+  const observer = new MutationObserver((mutations) => {
+    chrome.storage.local.get(["hideFeed"], (res) => {
+      const hideFeed = res.hideFeed ?? false; // Fallback zu false, wenn nicht gesetzt
+      toggleFeed(hideFeed); // Überprüfe, ob der Feed ausgeblendet werden soll
+    });
+  });
+
+  // Beobachte Änderungen an der Seite (dynamische Inhalte)
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+}
+
+// Initialen Wert aus dem Storage abrufen und den Feed sofort anpassen
+chrome.storage.local.get(["hideFeed"], (res) => {
+  const hideFeed = res.hideFeed ?? false;
+  toggleFeed(hideFeed); // Feed initial ein-/ausblenden
+  observeDOMChanges(); // Beobachte Änderungen an der Seite
+});
+
+// Echtzeit-Überwachung von Änderungen im Storage
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.hideFeed) {
+    toggleFeed(changes.hideFeed.newValue); // Ändert den Feed, wenn der Wert sich ändert
+  }
+});

@@ -5,11 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="getCurrentYear.js" defer></script>
+    <script src="popup.js" defer></script>
     <title>YouTube Focus</title>
   </head>
   <body>
     <h1>YouRecoHide</h1>
-    <img src="icon/icon.png" alt="YouTube Focus Icon" width="64" height="64" />
+    <img
+      src="icon/icon.png"
+      alt="YouTube Focus Icon"
+      width="64"
+      height="64"
+      style="display: block; margin: 0 auto"
+    />
+
+    <label class="switch">
+      <input type="checkbox" id="checkbox-subs" checked />
+      <span class="slider round"></span>
+      <span id="toggOnOff"></span>
+    </label>
 
     <p style="text-align: center" id="nameYear"></p>
   </body>

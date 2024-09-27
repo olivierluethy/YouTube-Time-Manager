@@ -15,9 +15,7 @@
 }
 
 body {
-  padding: 0;
-  margin: 0;
-  width: 200px;
+  width: 250px;
   background-color: black;
   color: white;
 }
@@ -26,9 +24,8 @@ h1 {
   text-align: center;
 }
 
-img {
-  display: block;
-  margin: 0 auto;
+span{
+  color: white;
 }
 
 .switch {
