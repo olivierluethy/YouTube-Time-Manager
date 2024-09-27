@@ -36,7 +36,7 @@ function hideYouTubeRecommendations() {
   hideForeignPlaylists("Dein Kanalname"); // Fremde Playlists ausblenden
   hideElement("ytd-watch-next-secondary-results-renderer"); // Tablist ausblenden
 
-// hideElement('.style-scope ytd-page-manager [role="main"]'); // YouTube Feed ausblenden
+  // hideElement('.style-scope ytd-page-manager [role="main"]'); // YouTube Feed ausblenden
   hideElement('.yt-simple-endpoint[title="Shorts"]'); // Shorts ausblenden
   hideElement('.yt-simple-endpoint[title="Startseite"]'); // Startseite ausblenden
   hideElement(".style-scope.ytd-guide-renderer:nth-child(3)"); // Entdecken ausblenden
@@ -52,6 +52,13 @@ function redirectToSubscriptions() {
   }
 }
 
+// Function to redirect traffic from Trending page to Subscriptions page
+function cheatingRedirect() {
+  if (window.location.pathname.startsWith("/feed/trending")) {
+    window.location.href = "https://www.youtube.com/feed/subscriptions";
+  }
+}
+
 // Observer zur Beobachtung von DOM-Änderungen einrichten
 function observeDOMChanges(callback) {
   const observer = new MutationObserver(callback);
@@ -60,5 +67,9 @@ function observeDOMChanges(callback) {
 
 // Initialisierung
 redirectToSubscriptions();
+
+// If you try to enter trends
+cheatingRedirect();
+
 observeDOMChanges(hideYouTubeRecommendations);
 hideYouTubeRecommendations();
