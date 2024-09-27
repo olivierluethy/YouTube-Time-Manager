@@ -62,17 +62,10 @@ function cheatingRedirect() {
 }
 
 // Observer zur Beobachtung von DOM-Änderungen einrichten
-function observeDOMChanges(callback) {
+function observeDOMForRecommendations(callback) {
   const observer = new MutationObserver(callback);
   observer.observe(document.body, { childList: true, subtree: true });
 }
-
-// Initialisierung
-redirectToSubscriptions();
-// If you try to enter trends
-cheatingRedirect();
-observeDOMChanges(hideYouTubeRecommendations);
-hideYouTubeRecommendations();
 
 // Funktion, um das Element zu verstecken oder anzuzeigen
 function toggleFeed(hideFeed) {
@@ -80,17 +73,19 @@ function toggleFeed(hideFeed) {
     '.style-scope ytd-page-manager [role="main"]'
   );
 
-  if (feedElement) {
-    feedElement.style.display = hideFeed ? "none" : "block";
+  // Überprüfe, ob das Element existiert und ob die aktuelle Seite die Abonnementseite ist
+  if (feedElement && window.location.pathname === "/feed/subscriptions") {
+    // Der Feed wird NUR angezeigt, wenn hideFeed TRUE ist, ansonsten ausgeblendet
+    feedElement.style.display = hideFeed ? "block" : "none";
   }
 }
 
-// Funktion zur Initialisierung des MutationObservers
-function observeDOMChanges() {
+// Funktion zur Initialisierung des MutationObservers für das Feed-Element
+function observeDOMForFeed() {
   const observer = new MutationObserver((mutations) => {
     chrome.storage.local.get(["hideFeed"], (res) => {
       const hideFeed = res.hideFeed ?? false; // Fallback zu false, wenn nicht gesetzt
-      toggleFeed(hideFeed); // Überprüfe, ob der Feed ausgeblendet werden soll
+      toggleFeed(hideFeed); // Überprüfe, ob der Feed angezeigt werden soll
     });
   });
 
@@ -101,11 +96,18 @@ function observeDOMChanges() {
   });
 }
 
+// Initialisierung
+redirectToSubscriptions();
+// If you try to enter trends
+cheatingRedirect();
+observeDOMForRecommendations(hideYouTubeRecommendations);
+hideYouTubeRecommendations();
+
 // Initialen Wert aus dem Storage abrufen und den Feed sofort anpassen
 chrome.storage.local.get(["hideFeed"], (res) => {
   const hideFeed = res.hideFeed ?? false;
-  toggleFeed(hideFeed); // Feed initial ein-/ausblenden
-  observeDOMChanges(); // Beobachte Änderungen an der Seite
+  toggleFeed(hideFeed); // Feed initial anzeigen/ausblenden
+  observeDOMForFeed(); // Beobachte Änderungen am Feed-Element
 });
 
 // Echtzeit-Überwachung von Änderungen im Storage
