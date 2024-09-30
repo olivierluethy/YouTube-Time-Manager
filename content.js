@@ -16,8 +16,8 @@ function hideElements(selector) {
   });
 }
 
-// Funktion, um fremde Playlists auszublenden, nur eigene werden angezeigt
-function hideForeignPlaylists(userChannelName) {
+// Funktion, um beim Zuschauen eines Videos innerhalb einer Playlist alle Vorschläge ausblenden nur Playlist soll noch angezeigt werden
+function keepPlaylistAlive(userChannelName) {
   const playlists = document.querySelectorAll(
     "#secondary #items ytd-playlist-panel-renderer"
   );
@@ -35,13 +35,13 @@ function hideForeignPlaylists(userChannelName) {
 // Hauptfunktion, um YouTube-Videovorschläge, Playlists und die Tablist auszublenden
 function hideYouTubeRecommendations() {
   hideElements("#secondary #related ytd-compact-video-renderer"); // Empfehlungen ausblenden
-  hideForeignPlaylists("Dein Kanalname"); // Fremde Playlists ausblenden
+  keepPlaylistAlive("Dein Kanalname"); // Fremde Playlists ausblenden
   hideElement("ytd-watch-next-secondary-results-renderer"); // Tablist ausblenden
-
-  // hideElement('.style-scope ytd-page-manager [role="main"]'); // YouTube Feed ausblenden
   hideElement('.yt-simple-endpoint[title="Shorts"]'); // Shorts ausblenden
   hideElement('.yt-simple-endpoint[title="Startseite"]'); // Startseite ausblenden
   hideElement(".style-scope.ytd-guide-renderer:nth-child(3)"); // Entdecken ausblenden
+  hideElement(".sbdd_b"); // Remove recommendations as you type at the search prompt
+  hideElement("ytd-notification-topbar-button-renderer.style-scope.ytd-masthead"); // Remove notification button
 }
 
 // YouTube-Weiterleitung zur Abonnementseite
@@ -80,6 +80,7 @@ function toggleFeed(hideFeed) {
   }
 }
 
+/* Interaction Chrome Storage to remove subs page videos */
 // Funktion zur Initialisierung des MutationObservers für das Feed-Element
 function observeDOMForFeed() {
   const observer = new MutationObserver((mutations) => {
@@ -116,3 +117,29 @@ chrome.storage.onChanged.addListener((changes) => {
     toggleFeed(changes.hideFeed.newValue); // Ändert den Feed, wenn der Wert sich ändert
   }
 });
+
+/* Interaction with YouTube Logo Click */
+// Funktion zum Hinzufügen des Event Listeners zum YouTube-Logo
+function addLogoClickListener() {
+  const logo = document.getElementById("logo");
+  if (logo) {
+    logo.addEventListener("click", (event) => {
+      event.preventDefault(); // Standardverhalten des Links verhindern
+      window.location.href = "https://www.youtube.com/feed/subscriptions"; // Weiterleitung zur Abonnementseite
+    });
+  }
+}
+
+// MutationObserver zur Beobachtung von DOM-Änderungen
+const observer = new MutationObserver((mutations) => {
+  addLogoClickListener(); // Überprüfe das Vorhandensein des Logos und füge den Listener hinzu
+});
+
+// Beobachte den Body auf Änderungen
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
+
+// Initialisiere den Listener beim ersten Laden der Seite
+addLogoClickListener();
