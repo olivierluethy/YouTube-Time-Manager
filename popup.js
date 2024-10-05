@@ -7,6 +7,14 @@ function updateToggleText(hideFeed) {
     : "Display Subs <strong>Off</strong>";
 }
 
+// Redirect auf Zielsetzungsseite
+document
+  .getElementById("redirectButton")
+  .addEventListener("click", function () {
+    // Erstelle einen neuen Tab mit der Optionsseite
+    chrome.tabs.create({ url: chrome.runtime.getURL('goals.html') });
+  });
+
 document.addEventListener("DOMContentLoaded", () => {
   const checkboxSubs = document.getElementById("checkbox-subs");
 

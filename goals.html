@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Define Your Goals</title>
+    <link rel="shortcut icon" href="icon/icon.png" />
+    <script src="goals.js" defer></script>
+    <style>
+      body {
+        text-align: center;
+        margin-top: 20px;
+        background-color: black;
+        color: white;
+      }
+      input[type="text"] {
+        width: 50%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+      }
+      #goals {
+        font-size: 13px;
+      }
+      span.remove-goal {
+        margin-left: 1rem;
+        color: red;
+      }
+      .remove-goal:hover {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Definiere deine Ziele</h1>
+    <p>Hier kannst du deine Ziele festlegen.</p>
+    <p>
+      Give specific input to get the most specific results. The videos will be
+      displayed inside the youtube feed.
+    </p>
+    <input
+      type="text"
+      id="goalInput"
+      placeholder="Enter a goal for example: How to code? How to draw something?"
+    />
+    <!-- Hier wird die Liste angezeigt -->
+    <p id="goals"></p>
+  </body>
+</html>

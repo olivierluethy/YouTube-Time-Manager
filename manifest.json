@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "YouRecoHide",
-  "version": "1.0",
+  "name": "YouTube Disblock",
+  "version": "1.0.1",
   "description": "Hides YouTube video recommendations, keeping playlist videos visible to reduce distractions.",
   "action": {
     "default_popup": "popup.html",
@@ -17,5 +17,9 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["storage"]
+  "permissions": ["storage"],
+  "web_accessible_resources": [{
+    "resources": ["goals.html"],
+    "matches": ["<all_urls>"]
+  }]
 }

@@ -41,7 +41,9 @@ function hideYouTubeRecommendations() {
   hideElement('.yt-simple-endpoint[title="Startseite"]'); // Startseite ausblenden
   hideElement(".style-scope.ytd-guide-renderer:nth-child(3)"); // Entdecken ausblenden
   hideElement(".sbdd_b"); // Remove recommendations as you type at the search prompt
-  hideElement("ytd-notification-topbar-button-renderer.style-scope.ytd-masthead"); // Remove notification button
+  hideElement(
+    "ytd-notification-topbar-button-renderer.style-scope.ytd-masthead"
+  ); // Remove notification button
 }
 
 // YouTube-Weiterleitung zur Abonnementseite
@@ -73,10 +75,20 @@ function toggleFeed(hideFeed) {
     '.style-scope ytd-page-manager [role="main"]'
   );
 
-  // Überprüfe, ob das Element existiert und ob die aktuelle Seite die Abonnementseite ist
-  if (feedElement && window.location.pathname === "/feed/subscriptions") {
-    // Der Feed wird NUR angezeigt, wenn hideFeed TRUE ist, ansonsten ausgeblendet
-    feedElement.style.display = hideFeed ? "block" : "none";
+  const abosFeedButton = document.querySelector(
+    '.yt-simple-endpoint[title="Abos"]'
+  );
+
+  // Check if the elements exist and if the current page is the subscriptions page
+  if (
+    feedElement &&
+    abosFeedButton &&
+    window.location.pathname === "/feed/subscriptions"
+  ) {
+    // Show or hide the feed and the Abos button based on hideFeed
+    const displayStyle = hideFeed ? "block" : "none";
+    feedElement.style.display = displayStyle;
+    abosFeedButton.style.display = displayStyle;
   }
 }
 
