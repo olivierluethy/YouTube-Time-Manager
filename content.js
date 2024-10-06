@@ -74,10 +74,25 @@ function searchVideos(goals) {
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
+      // Check if there is an error in the API response
+      if (data.error) {
+        console.error("API Error:", data.error);
+
+        // Check for permission denied or quota exceeded errors
+        if (
+          data.error.code === 403 ||
+          data.error.status === "PERMISSION_DENIED"
+        ) {
+          // Redirect if the user is unauthorized
+          window.location.href = "https://www.youtube.com/feed/subscriptions";
+          return; // Stop further execution
+        }
+      }
+
       // Process the search results and filter out Shorts
-      const videos = data.items.filter(
-        (video) => !video.id.videoId.includes("shorts")
-      ); // Filter out Shorts
+      const videos = data.items
+        ? data.items.filter((video) => !video.id.videoId.includes("shorts"))
+        : []; // Filter out Shorts
 
       // Log the recommendations to the console
       console.log("Video Recommendations:", videos);
@@ -115,7 +130,8 @@ function searchVideos(goals) {
         const videoUrl = `https://www.youtube.com/watch?v=${video.id.videoId}`; // Construct the video URL
 
         videoElement.innerHTML = `
-          <a href="${videoUrl}" target="_blank">  <img width="100%" height="180" src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}">
+          <a href="${videoUrl}" target="_blank">
+            <img width="100%" height="180" src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}">
           </a>
           <h3 style="color: white;">${video.snippet.title}</h3>
           <p style="color: white;">${video.snippet.description}</p>
@@ -128,10 +144,11 @@ function searchVideos(goals) {
       // Append the video container to the primary element
       primaryElement.appendChild(videoContainer);
     })
-    .catch(
-      (error) => console.error("Error fetching video recommendations:", error),
-      (window.location.href = "https://www.youtube.com/feed/subscriptions")
-    );
+    .catch((error) => {
+      console.error("Error fetching video recommendations:", error);
+      // Optionally redirect on fetch errors
+      window.location.href = "https://www.youtube.com/feed/subscriptions";
+    });
 }
 
 // Function to redirect traffic from Trending page to Subscriptions page
