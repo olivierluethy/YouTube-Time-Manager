@@ -91,21 +91,46 @@ function searchVideos(goals) {
         return;
       }
 
+      // Create a container for the videos with flexbox styles
+      const videoContainer = document.createElement("div");
+      videoContainer.style.display = "flex";
+      videoContainer.style.flexWrap = "wrap"; // Allow items to wrap
+      videoContainer.style.gap = "16px"; // Space between items
+      videoContainer.style.justifyContent = "flex-start"; // Align items to the start
+
       videos.forEach((video) => {
         // Create elements to display video information
         const videoElement = document.createElement("div");
+
+        // Responsive flex properties (optional)
+        videoElement.style.flex = "1 1 300px";
+        videoElement.style.maxWidth = "320px";
+
+        // Optional styling for aesthetics
+        videoElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+        videoElement.style.borderRadius = "8px";
+        videoElement.style.overflow = "hidden";
+        videoElement.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
+
         const videoUrl = `https://www.youtube.com/watch?v=${video.id.videoId}`; // Construct the video URL
 
         videoElement.innerHTML = `
-          <img src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}">
-          <h3><a href="${videoUrl}" target="_blank">${video.snippet.title}</a></h3>  <p>${video.snippet.description}</p>
+          <a href="${videoUrl}" target="_blank">  <img width="100%" height="180" src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}">
+          </a>
+          <h3 style="color: white;">${video.snippet.title}</h3>
+          <p style="color: white;">${video.snippet.description}</p>
         `;
-        // Append the video element to the primary container
-        primaryElement.appendChild(videoElement);
+
+        // Append the video element to the video container
+        videoContainer.appendChild(videoElement);
       });
+
+      // Append the video container to the primary element
+      primaryElement.appendChild(videoContainer);
     })
-    .catch((error) =>
-      console.error("Error fetching video recommendations:", error)
+    .catch(
+      (error) => console.error("Error fetching video recommendations:", error),
+      (window.location.href = "https://www.youtube.com/feed/subscriptions")
     );
 }
 
@@ -190,7 +215,7 @@ function addLogoClickListener() {
   if (logo) {
     logo.addEventListener("click", (event) => {
       event.preventDefault(); // Standardverhalten des Links verhindern
-      window.location.href = "https://www.youtube.com/feed/subscriptions"; // Weiterleitung zur Abonnementseite
+      redirectToSubscriptions();
     });
   }
 }
