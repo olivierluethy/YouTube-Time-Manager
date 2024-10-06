@@ -52,13 +52,34 @@ function redirectToSubscriptions() {
     window.location.hostname === "www.youtube.com" &&
     window.location.pathname === "/"
   ) {
-    // Do search queries exist? If yes, no redirect, stay on the same page and load recommended videos
+    // Check if there are any goals
     chrome.storage.sync.get("goals", function (data) {
       const goals = data.goals || [];
+
       if (goals.length > 0) {
+        // If goals exist, load recommended videos
         searchVideos(goals);
       } else {
-        window.location.href = "https://www.youtube.com/feed/subscriptions";
+        // If there are no goals, check hideFeed value
+        chrome.storage.local.get(["hideFeed"], (res) => {
+          const hideFeed = res.hideFeed ?? false; // Default to false if not set
+
+          // Hide the "Abos" button based on the hideFeed value
+          const abosButton = document.querySelector(
+            '.yt-simple-endpoint[title="Abos"]'
+          );
+          if (abosButton) {
+            abosButton.style.display = hideFeed ? "none" : "block"; // Hide or show based on hideFeed
+          }
+
+          if (hideFeed === false) {
+            // Redirect to the playlist section if hideFeed is false
+            window.location.href = "https://www.youtube.com/playlist?list=WL";
+          } else {
+            // Redirect to the subscriptions page if hideFeed is true
+            window.location.href = "https://www.youtube.com/feed/subscriptions";
+          }
+        });
       }
     });
   }
@@ -84,7 +105,18 @@ function searchVideos(goals) {
           data.error.status === "PERMISSION_DENIED"
         ) {
           // Redirect if the user is unauthorized
-          window.location.href = "https://www.youtube.com/feed/subscriptions";
+          // If there are no goals, check hideFeed value
+          chrome.storage.local.get(["hideFeed"], (res) => {
+            const hideFeed = res.hideFeed ?? false; // Default to false if not set
+            if (hideFeed === false) {
+              // Redirect to the playlist section if hideFeed is false
+              window.location.href = "https://www.youtube.com/playlist?list=WL";
+            } else {
+              // Redirect to the subscriptions page if hideFeed is true
+              window.location.href =
+                "https://www.youtube.com/feed/subscriptions";
+            }
+          });
           return; // Stop further execution
         }
       }
@@ -232,7 +264,22 @@ function addLogoClickListener() {
   if (logo) {
     logo.addEventListener("click", (event) => {
       event.preventDefault(); // Standardverhalten des Links verhindern
-      redirectToSubscriptions();
+
+      // Retrieve the current value of hideFeed from storage
+      chrome.storage.local.get(["hideFeed"], (res) => {
+        const hideFeed = res.hideFeed ?? false; // Default to false if not set
+
+        if (hideFeed === false) {
+          // Redirect to the playlist section if hideFeed is false
+          document.querySelector(
+            '.yt-simple-endpoint[title="Abos"]'
+          ).style.display = "none";
+          window.location.href = "https://www.youtube.com/playlist?list=WL";
+        } else {
+          // Redirect to the subscriptions page if hideFeed is true
+          redirectToSubscriptions();
+        }
+      });
     });
   }
 }
