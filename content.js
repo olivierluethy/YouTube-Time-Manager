@@ -52,8 +52,61 @@ function redirectToSubscriptions() {
     window.location.hostname === "www.youtube.com" &&
     window.location.pathname === "/"
   ) {
-    window.location.href = "https://www.youtube.com/feed/subscriptions";
+    // Do search queries exist? If yes, no redirect, stay on the same page and load recommended videos
+    chrome.storage.sync.get("goals", function (data) {
+      const goals = data.goals || [];
+      if (goals.length > 0) {
+        searchVideos(goals);
+      } else {
+        window.location.href = "https://www.youtube.com/feed/subscriptions";
+      }
+    });
   }
+}
+
+/* YouTube API interaction for feed results */
+function searchVideos(goals) {
+  const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo"; // Replace with your actual API key
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+    goals.join(" ")
+  )}&type=video&key=${apiKey}`;
+
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      // Process the search results and filter out Shorts
+      const videos = data.items.filter(
+        (video) => !video.id.videoId.includes("shorts")
+      ); // Filter out Shorts
+
+      // Log the recommendations to the console
+      console.log("Video Recommendations:", videos);
+
+      // Find the primary element to insert videos
+      const primaryElement = document.getElementById("primary");
+      primaryElement.innerHTML = ""; // Clear existing content
+
+      if (videos.length === 0) {
+        primaryElement.innerHTML = "<p>No video recommendations found.</p>";
+        return;
+      }
+
+      videos.forEach((video) => {
+        // Create elements to display video information
+        const videoElement = document.createElement("div");
+        const videoUrl = `https://www.youtube.com/watch?v=${video.id.videoId}`; // Construct the video URL
+
+        videoElement.innerHTML = `
+          <img src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}">
+          <h3><a href="${videoUrl}" target="_blank">${video.snippet.title}</a></h3>  <p>${video.snippet.description}</p>
+        `;
+        // Append the video element to the primary container
+        primaryElement.appendChild(videoElement);
+      });
+    })
+    .catch((error) =>
+      console.error("Error fetching video recommendations:", error)
+    );
 }
 
 // Function to redirect traffic from Trending page to Subscriptions page
