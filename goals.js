@@ -1,6 +1,7 @@
 var input = document.getElementById("goalInput");
 var goalsList = document.getElementById("goals");
 
+// TODO: Gruppierungen der Ziele hinzufügen
 // Lade die gespeicherten Ziele beim Laden der Seite
 chrome.storage.sync.get("goals", function (data) {
   if (data.goals) {

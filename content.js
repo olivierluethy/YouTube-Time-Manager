@@ -87,100 +87,159 @@ function redirectToSubscriptions() {
 
 /* YouTube API interaction for feed results */
 function searchVideos(goals) {
-  const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo"; // Replace with your actual API key
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-    goals.join(" ")
-  )}&type=video&key=${apiKey}`;
+  if (!goals || goals.length === 0) {
+    console.log("No goals provided. Exiting the function.");
+    return;
+  }
 
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      // Check if there is an error in the API response
-      if (data.error) {
-        console.error("API Error:", data.error);
+  chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
+    const storedGoals = res.doubleGoals || [];
+    const storedVideos = res.videoData || [];
 
-        // Check for permission denied or quota exceeded errors
-        if (
-          data.error.code === 403 ||
-          data.error.status === "PERMISSION_DENIED"
-        ) {
-          // Redirect if the user is unauthorized
-          // If there are no goals, check hideFeed value
-          chrome.storage.local.get(["hideFeed"], (res) => {
-            const hideFeed = res.hideFeed ?? false; // Default to false if not set
-            if (hideFeed === false) {
-              // Redirect to the playlist section if hideFeed is false
-              window.location.href = "https://www.youtube.com/playlist?list=WL";
-            } else {
-              // Redirect to the subscriptions page if hideFeed is true
-              window.location.href =
-                "https://www.youtube.com/feed/subscriptions";
-            }
-          });
-          return; // Stop further execution
+    // TODO: Make the feed created by extension look originally like this from youtube itself
+    // TODO: Make it possible to save videos recommended
+    // TODO: Auf der Startliste anzeigen für welches Ziel welche Videos angezeigt werden und nicht flach alles auf einmal
+    // Compare the current goals with stored goals
+    if (JSON.stringify(storedGoals) === JSON.stringify(goals)) {
+      console.log("Goals are the same, displaying cached videos.");
+      console.log("Cached Videos:", storedVideos); // Debugging output
+
+      // Dieser Teil soll nach 5 Sekunden erst geladen werden
+      setTimeout(() => {
+        const primaryElement = document.getElementById("primary");
+
+        // Überprüfe, ob das primäre Element existiert
+        if (!primaryElement) {
+          console.error("Element mit ID 'primary' wurde nicht gefunden.");
+          return; // Beende die Funktion, wenn das Element nicht existiert
         }
-      }
 
-      // Process the search results and filter out Shorts
-      const videos = data.items
-        ? data.items.filter((video) => !video.id.videoId.includes("shorts"))
-        : []; // Filter out Shorts
+        primaryElement.innerHTML = ""; // Clear existing content
 
-      // Log the recommendations to the console
-      console.log("Video Recommendations:", videos);
+        const videoContainer = document.createElement("div");
+        videoContainer.style.display = "flex";
+        videoContainer.style.flexWrap = "wrap";
+        videoContainer.style.gap = "16px";
+        videoContainer.style.justifyContent = "flex-start";
 
-      // Find the primary element to insert videos
-      const primaryElement = document.getElementById("primary");
-      primaryElement.innerHTML = ""; // Clear existing content
+        storedVideos.forEach((video) => {
+          const videoElement = document.createElement("div");
+          videoElement.style.flex = "1 1 300px";
+          videoElement.style.maxWidth = "320px";
+          videoElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+          videoElement.style.borderRadius = "8px";
+          videoElement.style.overflow = "hidden";
+          videoElement.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
 
-      if (videos.length === 0) {
-        primaryElement.innerHTML = "<p>No video recommendations found.</p>";
-        return;
-      }
+          videoElement.innerHTML = `
+        <a href="${video.url}" target="_blank">
+          <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}">
+        </a>
+        <h3 style="color: white;margin-left:0.5rem;">${video.title}</h3>
+        <p style="color: white;margin-left:0.5rem;">${video.description}</p>
+      `;
 
-      // Create a container for the videos with flexbox styles
-      const videoContainer = document.createElement("div");
-      videoContainer.style.display = "flex";
-      videoContainer.style.flexWrap = "wrap"; // Allow items to wrap
-      videoContainer.style.gap = "16px"; // Space between items
-      videoContainer.style.justifyContent = "flex-start"; // Align items to the start
+          videoContainer.appendChild(videoElement);
+        });
 
-      videos.forEach((video) => {
-        // Create elements to display video information
-        const videoElement = document.createElement("div");
+        primaryElement.appendChild(videoContainer);
+      }, 200); // 5000 Millisekunden = 5 Sekunden
+    } else {
+      const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+        goals.join(" ")
+      )}&type=video&key=${apiKey}`;
 
-        // Responsive flex properties (optional)
-        videoElement.style.flex = "1 1 300px";
-        videoElement.style.maxWidth = "320px";
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            console.error("API Error:", data.error);
+            handleAPIErrors(data.error);
+            return;
+          }
 
-        // Optional styling for aesthetics
-        videoElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-        videoElement.style.borderRadius = "8px";
-        videoElement.style.overflow = "hidden";
-        videoElement.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
+          const videos = data.items
+            ? data.items.filter((video) => !video.id.videoId.includes("shorts"))
+            : [];
 
-        const videoUrl = `https://www.youtube.com/watch?v=${video.id.videoId}`; // Construct the video URL
+          console.log("Video Recommendations:", videos);
 
-        videoElement.innerHTML = `
-          <a href="${videoUrl}" target="_blank">
-            <img width="100%" height="180" src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}">
-          </a>
-          <h3 style="color: white;">${video.snippet.title}</h3>
-          <p style="color: white;">${video.snippet.description}</p>
-        `;
+          if (videos.length === 0) {
+            document.getElementById("primary").innerHTML =
+              "<p>No video recommendations found.</p>";
+            return;
+          }
 
-        // Append the video element to the video container
-        videoContainer.appendChild(videoElement);
-      });
+          const videoData = videos.map((video) => ({
+            title: video.snippet.title,
+            url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
+            description: video.snippet.description,
+            thumbnail: video.snippet.thumbnails.default.url,
+          }));
 
-      // Append the video container to the primary element
-      primaryElement.appendChild(videoContainer);
-    })
-    .catch((error) => {
-      console.error("Error fetching video recommendations:", error);
-      // Optionally redirect on fetch errors
-      window.location.href = "https://www.youtube.com/feed/subscriptions";
-    });
+          // Store the new goals and videos in Chrome Storage
+          chrome.storage.sync.set(
+            { doubleGoals: goals, videoData: videoData },
+            () => {
+              console.log("Goals and video data stored:", goals, videoData);
+            }
+          );
+
+          displayVideos(videoData);
+        })
+        .catch((error) => {
+          console.error("Error fetching video recommendations:", error);
+          // Redirect or handle error
+        });
+    }
+  });
+}
+
+function displayVideos(videoData) {
+  console.log("The Videos are here! " + videoData);
+
+  const primaryElement = document.getElementById("primary");
+  primaryElement.innerHTML = ""; // Clear existing content
+
+  if (videoData.length === 0) {
+    primaryElement.innerHTML = "<p>No video recommendations found.</p>";
+    return; // Early exit if no videos
+  }
+
+  const videoContainer = document.createElement("div");
+  videoContainer.style.display = "flex";
+  videoContainer.style.flexWrap = "wrap";
+  videoContainer.style.gap = "16px";
+  videoContainer.style.justifyContent = "flex-start";
+
+  videoData.forEach((video) => {
+    const videoElement = document.createElement("div");
+    videoElement.style.flex = "1 1 300px";
+    videoElement.style.maxWidth = "320px";
+    videoElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+    videoElement.style.borderRadius = "8px";
+    videoElement.style.overflow = "hidden";
+    videoElement.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
+
+    videoElement.innerHTML = `
+      <a href="${video.url}" target="_blank">
+        <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}">
+      </a>
+      <h3 style="color: white;">${video.title}</h3>
+      <p style="color: white;">${video.description}</p>
+    `;
+
+    videoContainer.appendChild(videoElement);
+  });
+
+  primaryElement.appendChild(videoContainer);
+}
+
+function handleAPIErrors(error) {
+  if (error.code === 403 || error.status === "PERMISSION_DENIED") {
+    // Handle permissions and redirect logic
+  }
 }
 
 // Function to redirect traffic from Trending page to Subscriptions page
