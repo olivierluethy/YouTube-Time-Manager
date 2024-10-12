@@ -7,16 +7,39 @@
     <script src="goals.js" defer></script>
     <style>
       body {
+        margin: 0;
+        padding: 0;
         text-align: center;
-        margin-top: 20px;
         background-color: black;
         color: white;
+        font-family: Arial, Helvetica, sans-serif;
       }
       input[type="text"] {
         width: 50%;
         padding: 12px 20px;
-        margin: 8px 0;
+        margin: 16px 0;
+        border: none;
         box-sizing: border-box;
+        box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+        -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+        -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+        transition-duration: 0.5s;
+      }
+      /* When the input field gets focus, change its width to 100% */
+      input[type="text"]:focus {
+        border-radius: 20px;
+      }
+      .header {
+        background-color: white;
+        color: black;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        width: 100%;
+        /* https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only */
+        box-shadow: 0 4px 2px -2px gray;
+      }
+      h1 {
+        font-size: 50px;
       }
       #goals {
         font-size: 13px;
@@ -31,12 +54,16 @@
     </style>
   </head>
   <body>
-    <h1>Define your goals</h1>
-    <p>Here you can define your goals.</p>
-    <p>
-      Give specific input to get the most specific results. Your information will be sent to YouTube API The videos will be
-      displayed inside the youtube feed.
-    </p>
+    <div class="header">
+      <h1>Define your goals</h1>
+      <h3>Here you can define your goals.</h3>
+      <h3>
+        Enter specific information to get the most accurate results. Your
+        information will be sent to the YouTube API and the videos will be
+        displayed within the YouTube feed.
+      </h3>
+    </div>
+
     <input
       type="text"
       id="goalInput"

@@ -1,5 +1,16 @@
 "use strict";
 
+// Initialisierung
+redirectToSubscriptions();
+// If you try to enter trends
+cheatingRedirect();
+observeDOMForRecommendations(hideYouTubeRecommendations);
+hideYouTubeRecommendations();
+// Funktion um Videovorschläge nach dem Betrachten eines Videos auszublenden
+removeRecoOnVideo();
+// Initialisiere den Listener beim ersten Laden der Seite
+addLogoClickListener();
+
 // Funktion, um ein Element anhand eines Selektors auszublenden
 function hideElement(selector) {
   const element = document.querySelector(selector);
@@ -85,6 +96,38 @@ function redirectToSubscriptions() {
   }
 }
 
+// YouTube Video Vorschläge ausblenden am Ende eines Videos
+function removeRecoOnVideo() {
+  // Überprüfen, ob die aktuelle URL ein YouTube-Video ist
+  const isVideoPage = () =>
+    window.location.href.includes("youtube.com/watch?v=");
+
+  // Funktion zum Ausblenden der Videoempfehlungen
+  const hideRecommendations = () => {
+    const distOnVid = document.querySelector(
+      ".html5-endscreen.ytp-player-content.videowall-endscreen.ytp-endscreen-paginate.ytp-show-tiles"
+    );
+    if (distOnVid) {
+      distOnVid.style.display = "none";
+    }
+  };
+
+  // Initiales Überprüfen der URL
+  if (isVideoPage()) {
+    hideRecommendations();
+  }
+
+  // Observer, um Änderungen der URL zu überwachen
+  const observer = new MutationObserver(() => {
+    if (isVideoPage()) {
+      hideRecommendations();
+    }
+  });
+
+  // Observer-Konfiguration
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 /* YouTube API interaction for feed results */
 function searchVideos(goals) {
   if (!goals || goals.length === 0) {
@@ -160,7 +203,15 @@ function searchVideos(goals) {
           }
 
           const videos = data.items
-            ? data.items.filter((video) => !video.id.videoId.includes("shorts"))
+            ? data.items.filter((video) => {
+                const titleLower = video.snippet.title.toLowerCase();
+                const descriptionLower =
+                  video.snippet.description?.toLowerCase(); // Optional chaining for description
+                return !(
+                  titleLower.includes("shorts") ||
+                  (descriptionLower && descriptionLower.includes("shorts"))
+                );
+              })
             : [];
 
           console.log("Video Recommendations:", videos);
@@ -282,10 +333,19 @@ function toggleFeed(hideFeed) {
 // Funktion zur Initialisierung des MutationObservers für das Feed-Element
 function observeDOMForFeed() {
   const observer = new MutationObserver((mutations) => {
-    chrome.storage.local.get(["hideFeed"], (res) => {
-      const hideFeed = res.hideFeed ?? false; // Fallback zu false, wenn nicht gesetzt
-      toggleFeed(hideFeed); // Überprüfe, ob der Feed angezeigt werden soll
-    });
+    try {
+      // Sicherstellen, dass der Chrome-Storage-Zugriff nur erfolgt, wenn der Kontext gültig ist
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(["hideFeed"], (res) => {
+          const hideFeed = res.hideFeed ?? false; // Fallback zu false, wenn nicht gesetzt
+          toggleFeed(hideFeed); // Überprüfe, ob der Feed angezeigt werden soll
+        });
+      } else {
+        console.error("Chrome Storage API ist nicht verfügbar.");
+      }
+    } catch (err) {
+      console.error("Fehler beim Zugriff auf Chrome Storage: ", err);
+    }
   });
 
   // Beobachte Änderungen an der Seite (dynamische Inhalte)
@@ -294,13 +354,6 @@ function observeDOMForFeed() {
     subtree: true,
   });
 }
-
-// Initialisierung
-redirectToSubscriptions();
-// If you try to enter trends
-cheatingRedirect();
-observeDOMForRecommendations(hideYouTubeRecommendations);
-hideYouTubeRecommendations();
 
 // Initialen Wert aus dem Storage abrufen und den Feed sofort anpassen
 chrome.storage.local.get(["hideFeed"], (res) => {
@@ -353,6 +406,5 @@ observer.observe(document.body, {
   childList: true,
   subtree: true,
 });
-
-// Initialisiere den Listener beim ersten Laden der Seite
-addLogoClickListener();
+// YouTube Titel mit Anzahl notifications zu entfernen
+document.title = document.title.replace(/\s*\(\d+\)/g, "");
