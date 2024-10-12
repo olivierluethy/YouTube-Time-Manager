@@ -12,7 +12,7 @@ document
   .getElementById("redirectButton")
   .addEventListener("click", function () {
     // Erstelle einen neuen Tab mit der Optionsseite
-    chrome.tabs.create({ url: chrome.runtime.getURL('goals.html') });
+    chrome.tabs.create({ url: chrome.runtime.getURL('/pages/goals.html') });
   });
 
 document.addEventListener("DOMContentLoaded", () => {
