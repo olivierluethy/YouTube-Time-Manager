@@ -11,22 +11,6 @@ removeRecoOnVideo();
 // Initialisiere den Listener beim ersten Laden der Seite
 addLogoClickListener();
 
-// Funktion, um ein Element anhand eines Selektors auszublenden
-function hideElement(selector) {
-  const element = document.querySelector(selector);
-  if (element) {
-    element.style.display = "none";
-  }
-}
-
-// Funktion, um mehrere Elemente anhand eines Selektors auszublenden
-function hideElements(selector) {
-  const elements = document.querySelectorAll(selector);
-  elements.forEach((element) => {
-    element.style.display = "none";
-  });
-}
-
 // Funktion, um beim Zuschauen eines Videos innerhalb einer Playlist alle Vorschläge ausblenden nur Playlist soll noch angezeigt werden
 function keepPlaylistAlive(userChannelName) {
   const playlists = document.querySelectorAll(
