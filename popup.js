@@ -32,3 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateToggleText(isChecked); // Aktualisiere den Text sofort
   });
 });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "openGoalsPage") {
+    console.log("Message has arrived");
+    // Create a new tab with the options page URL
+    chrome.tabs.create({ url: chrome.runtime.getURL('../pages/goals.html') });
+  }
+});
