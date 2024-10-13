@@ -11,6 +11,9 @@
       "128": "icon/icon.png"
     }
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*", "https://youtube.com/*"],
@@ -23,7 +26,11 @@
         "scripts/content.js"]
     }
   ],
-  "permissions": ["tabs, activeTab, storage"],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
   "web_accessible_resources": [{
     "resources": ["goals.html"],
     "matches": ["<all_urls>"]

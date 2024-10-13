@@ -12,7 +12,7 @@ document
   .getElementById("redirectButton")
   .addEventListener("click", function () {
     // Erstelle einen neuen Tab mit der Optionsseite
-    chrome.tabs.create({ url: chrome.runtime.getURL('/pages/goals.html') });
+    chrome.tabs.create({ url: chrome.runtime.getURL("/pages/goals.html") });
   });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,11 +31,4 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.storage.local.set({ hideFeed: isChecked }); // Speichern in Storage
     updateToggleText(isChecked); // Aktualisiere den Text sofort
   });
-});
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "openGoalsPage") {
-    console.log("Message has arrived");
-    // Create a new tab with the options page URL
-    chrome.tabs.create({ url: chrome.runtime.getURL('../pages/goals.html') });
-  }
 });
