@@ -28,33 +28,52 @@ function hideYouTubeRecommendations() {
   ); // Remove notification button
 }
 // YouTube Video Vorschläge ausblenden am Ende eines Videos
+// Funktion, um YouTube Videoempfehlungen am Ende eines Videos auszublenden
 function removeRecoOnVideo() {
-  // Überprüfen, ob die aktuelle URL ein YouTube-Video ist
-  const isVideoPage = () =>
-    window.location.href.includes("youtube.com/watch?v=");
+  console.log("Bereit!");
 
-  // Funktion zum Ausblenden der Videoempfehlungen
-  const hideRecommendations = () => {
-    const distOnVid = document.querySelector(
-      ".html5-endscreen.ytp-player-content.videowall-endscreen.ytp-endscreen-paginate.ytp-show-tiles"
-    );
-    if (distOnVid) {
-      distOnVid.style.display = "none";
-    }
-  };
-
-  // Initiales Überprüfen der URL
-  if (isVideoPage()) {
-    hideRecommendations();
+  // Überprüfen, ob die aktuelle URL eine Video-Seite ist
+  function istVideoSeite() {
+    return window.location.href.includes("youtube.com/watch?v=");
   }
 
-  // Observer, um Änderungen der URL zu überwachen
-  const observer = new MutationObserver(() => {
-    if (isVideoPage()) {
-      hideRecommendations();
+  // Funktion, die darauf wartet, dass das Videoempfehlungen-Element erscheint, bevor es ausgeblendet wird
+  function warteUndEntferneEmpfehlungen(selector, callback) {
+    const intervalId = setInterval(() => {
+      const element = document.querySelector(selector);
+      if (element) {
+        clearInterval(intervalId); // Stoppt die Schleife, wenn das Element gefunden wurde
+        callback(element); // Führt die Aktion aus, wenn das Element existiert
+      }
+    }, 500); // Alle 500ms wird geprüft, ob das Element vorhanden ist
+  }
+
+  // Ausblenden der Videoempfehlungen am Ende des Videos
+  function ausblendenEmpfehlungen(element) {
+    element.style.display = "none";
+    console.log("Videoempfehlungen ausgeblendet!");
+  }
+
+  // Beim Laden der Seite prüfen, ob es sich um eine Video-Seite handelt
+  if (istVideoSeite()) {
+    warteUndEntferneEmpfehlungen(
+      ".html5-endscreen.ytp-player-content.videowall-endscreen.ytp-endscreen-paginate.ytp-show-tiles",
+      ausblendenEmpfehlungen
+    );
+  }
+
+  // Beobachter, der auf Änderungen in der URL reagiert
+  const urlBeobachter = new MutationObserver(function () {
+    if (istVideoSeite()) {
+      warteUndEntferneEmpfehlungen(
+        ".html5-endscreen.ytp-player-content.videowall-endscreen.ytp-endscreen-paginate.ytp-show-tiles",
+        ausblendenEmpfehlungen
+      );
     }
   });
 
-  // Observer-Konfiguration
-  observer.observe(document.body, { childList: true, subtree: true });
+  // Starten des Beobachters, um Änderungen im DOM zu überwachen
+  urlBeobachter.observe(document.body, { childList: true, subtree: true });
 }
+
+removeRecoOnVideo();
