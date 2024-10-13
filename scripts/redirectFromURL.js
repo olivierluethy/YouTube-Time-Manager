@@ -45,7 +45,9 @@ function redirectToSubscriptions() {
 }
 function checkIfLogin() {
   console.log("Loginüberprüfung aktiviert!");
-  if (window.location.href === "https://www.youtube.com/playlist?list=WL") {
+  if (
+    window.location.href.startsWith("https://www.youtube.com/playlist?list=WL")
+  ) {
     console.log("Du bist in der Playlist!");
 
     // Intervall erstellen, um die Überprüfung alle 30 Sekunden durchzuführen
