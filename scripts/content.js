@@ -42,40 +42,32 @@ function removeNotificationFromTitle() {
   }
 }
 function noGoalStopper() {
-  if (
-    window.location.href.startsWith(
-      "https://www.youtube.com/results?search_query="
-    )
-  ) {
-    // Intervall erstellen, um die Überprüfung regelmäßig durchzuführen
-    const intervalId = setInterval(() => {
-      console.log("We are listening to your goals");
+  let isOnSearchPage = false; // Flag to track if we are on the search results page
 
-      // Ziele aus dem Chrome-Speicher abrufen
+  // Function to handle the visibility of search results and warnings
+  const checkGoalsAndUpdateUI = () => {
+    // Use setTimeout to delay execution by 250 milliseconds
+    setTimeout(() => {
       chrome.storage.sync.get("goals", function (data) {
         const goals = data.goals || [];
 
-        // Wenn keine Ziele definiert sind
+        // If no goals are defined
         if (goals.length === 0) {
-          console.log("Es wurden keine Ziele definiert");
-          // Haupt-Element holen, in dem die Nachricht angezeigt werden soll
           const mainElement = document.querySelector(
             ".style-scope.ytd-page-manager[role='main']"
           );
 
-          // Suchergebnisse ausblenden, falls keine Ziele vorhanden sind
+          // Hide search results and show warning if no goals are present
           const searchResults = document.querySelector("#primary");
           if (searchResults) {
             searchResults.style.display = "none";
           }
 
-          // Container Box on the right
           const container = document.querySelector(".style-scope.ytd-search");
           if (container) {
             container.style.display = "none";
           }
 
-          // Search Header
           const header = document.querySelector(
             ".style-scope.ytd-page-manager[role='main']"
           );
@@ -83,7 +75,6 @@ function noGoalStopper() {
             header.style.height = "50vh";
           }
 
-          // Filter-Knopf ausblenden
           const filterButton = document.querySelector(
             '.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text[aria-label="Suchfilter"]'
           );
@@ -91,21 +82,18 @@ function noGoalStopper() {
             filterButton.style.display = "none";
           }
 
-          // Überprüfen, ob die Elemente bereits existieren
           const existingWarning = document.querySelector(".goal-warning");
 
-          // Wenn das Haupt-Element existiert und die Warnung noch nicht erstellt wurde
+          // Create warning and button if they do not exist
           if (mainElement && !existingWarning) {
-            // Erstelle ein Wrapper-Div für die Warnung und den Button, damit beide in derselben Klasse sind
             const warningDiv = document.createElement("div");
-            warningDiv.className = "goal-warning"; // Beide Elemente in dieser Klasse
+            warningDiv.className = "goal-warning";
             warningDiv.style.cssText = `
               text-align: center;
               margin-top: auto;
               margin-bottom: auto;
             `;
 
-            // Nachricht hinzufügen
             const h1Element = document.createElement("h1");
             h1Element.textContent = "Please define your goals first.";
             h1Element.style.cssText = `
@@ -113,7 +101,6 @@ function noGoalStopper() {
               font-size: 30px;
             `;
 
-            // Button hinzufügen
             const defineGoalsButton = document.createElement("button");
             defineGoalsButton.textContent = "Define Goals";
             defineGoalsButton.style.cssText = `
@@ -127,83 +114,87 @@ function noGoalStopper() {
               margin-top: 20px;
               transition-duration: 0.5s;
             `;
-            // Add mouseover and mouseout event listeners for hover effect
+
             defineGoalsButton.addEventListener("mouseover", function () {
-              defineGoalsButton.style.backgroundColor = "white"; // Change to desired hover color
-              defineGoalsButton.style.color = "blue"; // Change text color on hover if needed
-              defineGoalsButton.style.transform = "scale(1.05)"; // Optional scaling
+              defineGoalsButton.style.backgroundColor = "white";
+              defineGoalsButton.style.color = "blue";
+              defineGoalsButton.style.transform = "scale(1.05)";
             });
 
             defineGoalsButton.addEventListener("mouseout", function () {
-              defineGoalsButton.style.backgroundColor = "blue"; // Reset to original color
-              defineGoalsButton.style.color = "white"; // Reset text color
-              defineGoalsButton.style.transform = "scale(1)"; // Reset scaling
+              defineGoalsButton.style.backgroundColor = "blue";
+              defineGoalsButton.style.color = "white";
+              defineGoalsButton.style.transform = "scale(1)";
             });
             defineGoalsButton.title = "Click here to go to the goals page.";
 
-            // Button-Klick-Event hinzufügen
             defineGoalsButton.addEventListener("click", function () {
-              // Nachricht an Hintergrundskript senden, um neuen Tab zu öffnen
               chrome.runtime.sendMessage({ action: "openGoalsPage" });
             });
 
-            // Füge die Nachricht und den Button in den Wrapper-Div ein
             warningDiv.appendChild(h1Element);
             warningDiv.appendChild(defineGoalsButton);
-
-            // Füge das Wrapper-Div an das Haupt-Element ein
             mainElement.insertBefore(warningDiv, mainElement.firstChild);
 
-            // Entdecker-Sektion ausblenden
+            // Hide the Discover section
             const discover = document.querySelector(
               ".style-scope.ytd-guide-renderer:nth-child(4)"
             );
             if (discover) {
               discover.style.display = "none";
             }
-
-            // Intervall beenden, sobald die Nachricht angezeigt wurde
-            clearInterval(intervalId);
           }
         } else {
-          // Wenn Ziele definiert sind, Suchergebnisse anzeigen
+          // If goals are defined, show search results
           const searchResults = document.querySelector("#primary");
           if (searchResults) {
-            searchResults.style.display = "block"; // Suchergebnisse wieder einblenden
+            searchResults.style.display = "block";
           }
 
-          // Filter-Knopf wieder anzeigen
           const filterButton = document.querySelector(
             '.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text[aria-label="Suchfilter"]'
           );
           if (filterButton) {
-            filterButton.style.display = "inline-block"; // Filter wieder anzeigen
+            filterButton.style.display = "inline-block";
           }
 
-          // Warnung und Button ausblenden, falls vorhanden
           const existingH1 = document.querySelector("h1.goal-warning");
           const existingButton = document.querySelector("button.define-goals");
+          if (existingH1) existingH1.remove();
+          if (existingButton) existingButton.remove();
 
-          if (existingH1) {
-            existingH1.remove(); // Entfernt die Warnung
-          }
-          if (existingButton) {
-            existingButton.remove(); // Entfernt den Button
-          }
-
-          // Entdecker-Sektion wieder anzeigen
           const discover = document.querySelector(
             ".style-scope.ytd-guide-renderer:nth-child(4)"
           );
           if (discover) {
-            discover.style.display = "block"; // Entdecker-Sektion wieder einblenden
+            discover.style.display = "block";
           }
-
-          // Intervall beenden, wenn Ziele definiert sind
-          clearInterval(intervalId);
         }
       });
-    }, 250);
+    }, 250); // Delay of 250 milliseconds
+  };
+
+  // Initial check for the URL
+  if (window.location.href.startsWith("https://www.youtube.com/")) {
+    isOnSearchPage = false;
+
+    // Set up a MutationObserver to listen for URL changes
+    const observer = new MutationObserver(() => {
+      // Check for search query URL
+      if (
+        window.location.href.startsWith(
+          "https://www.youtube.com/results?search_query="
+        )
+      ) {
+        isOnSearchPage = true; // Update the flag when on the search results page
+        checkGoalsAndUpdateUI(); // Check goals and update UI
+      } else {
+        isOnSearchPage = false; // Update the flag when leaving the search results page
+      }
+    });
+
+    // Start observing the body for changes
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 }
 

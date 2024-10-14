@@ -43,38 +43,47 @@ function redirectToSubscriptions() {
     });
   }
 }
+let isOnPlaylistPage = false; // Flag to check if we are on the playlist page
+
 function checkIfLogin() {
-  console.log("Loginüberprüfung aktiviert!");
+  // Initial check for the URL
   if (
     window.location.href.startsWith("https://www.youtube.com/playlist?list=WL")
   ) {
+    console.log("Loginüberprüfung aktiviert!");
+    isOnPlaylistPage = true; // Set flag to true
     console.log("Du bist in der Playlist!");
 
-    // Intervall erstellen, um die Überprüfung alle 30 Sekunden durchzuführen
+    // Create an interval to check for alerts
     const intervalId = setInterval(() => {
-      // Hole das Element mit der ID "alerts"
+      // Check if we are still on the playlist page
+      if (!isOnPlaylistPage) {
+        clearInterval(intervalId); // Stop the interval if we are not on the playlist page
+        return;
+      }
+
+      // Get the element with the ID "alerts"
       const alertsElement = document.getElementById("alerts");
 
-      // Überprüfe, ob das Element gefunden wurde
+      // Check if the alerts element exists
       if (alertsElement) {
         console.log("Der Alert Text existiert!");
-        // Suche nach dem yt-alert-renderer innerhalb von alertsElement
+
+        // Find the yt-alert-renderer within alertsElement
         const alertRenderer = alertsElement.querySelector(
           ".style-scope.ytd-browse"
         );
         if (alertRenderer) {
-          // Suche nach dem Element mit der Klasse "ERROR" innerhalb von alertRenderer
+          // Check for the element with the class "ERROR" within alertRenderer
           const errorElement = alertRenderer.querySelector(".ERROR");
           if (errorElement) {
-            // Wenn das Element existiert, setze den Stil
+            // Hide the alerts element
             alertsElement.style.display = "none";
 
-            // Hole das Element mit der Klasse "style-scope ytd-page-manager" und dem Role "main"
+            // Find the main element
             const mainElement = document.querySelector(
               ".style-scope.ytd-page-manager[role='main']"
             );
-
-            // Wenn das Element existiert, erstelle ein neues h1-Element
             if (mainElement) {
               const h1Element = document.createElement("h1");
               h1Element.textContent = "You are currently not logged in";
@@ -84,7 +93,7 @@ function checkIfLogin() {
               `;
               mainElement.insertBefore(h1Element, mainElement.firstChild);
 
-              // Erstelle einen Button
+              // Create a button
               const loginButton = document.createElement("button");
               loginButton.textContent = "Sign up for YouTube";
               loginButton.style.cssText = `
@@ -98,10 +107,10 @@ function checkIfLogin() {
                 font-size: 15px;
               `;
 
-              // Füge den Button nach dem h1-Element hinzu
+              // Add the button after the h1 element
               mainElement.insertBefore(loginButton, h1Element.nextSibling);
 
-              // Füge einen Klick-EventListener hinzu, der zum YouTube-Login führt
+              // Add click event listener for the button
               loginButton.addEventListener("click", () => {
                 window.location.href =
                   "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dde%26next%3Dhttps%253A%252F%252Fwww.youtube.com%252Fplaylist%253Flist%253DWL&hl=de&ec=65620";
@@ -111,7 +120,7 @@ function checkIfLogin() {
               document.querySelector(
                 ".style-scope.ytd-guide-renderer:nth-child(4)"
               ).style.display = "none";
-              clearInterval(intervalId); // Intervall beenden, wenn beide Elemente gefunden wurden
+              clearInterval(intervalId); // Stop the interval when both elements are found
             } else {
               console.warn(
                 "Element mit der Klasse 'style-scope.ytd-page-manager[role='main']' nicht gefunden."
@@ -123,8 +132,23 @@ function checkIfLogin() {
         console.warn("Element mit der ID 'alerts' nicht gefunden.");
       }
     }, 250);
+
+    // Set up a MutationObserver to listen for URL changes
+    const observer = new MutationObserver(() => {
+      if (
+        !window.location.href.startsWith(
+          "https://www.youtube.com/playlist?list=WL"
+        )
+      ) {
+        isOnPlaylistPage = false; // Update the flag when leaving the playlist page
+      }
+    });
+
+    // Start observing the body for changes
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 }
+
 checkIfLogin();
 
 /* Interaction with YouTube Logo Click */
