@@ -162,13 +162,20 @@ function addLogoClickListener() {
       // Retrieve the current value of hideFeed from storage
       chrome.storage.local.get(["hideFeed"], (res) => {
         const hideFeed = res.hideFeed ?? false; // Default to false if not set
-
         if (hideFeed === false) {
-          // Redirect to the playlist section if hideFeed is false
-          document.querySelector(
-            '.yt-simple-endpoint[title="Abos"]'
-          ).style.display = "none";
-          window.location.href = "https://www.youtube.com/playlist?list=WL";
+          chrome.storage.sync.get("goals", function (data) {
+            const goals = data.goals || [];
+            // If no goals are defined
+            if (goals.length > 0) {
+              window.location.href = "https://www.youtube.com/";
+            } else {
+              // Redirect to the playlist section if hideFeed is false
+              document.querySelector(
+                '.yt-simple-endpoint[title="Abos"]'
+              ).style.display = "none";
+              window.location.href = "https://www.youtube.com/playlist?list=WL";
+            }
+          });
         } else {
           // Redirect to the subscriptions page if hideFeed is true
           redirectToSubscriptions();
