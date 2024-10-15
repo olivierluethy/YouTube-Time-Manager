@@ -23,6 +23,7 @@
         "scripts/keepPlaylist.js",
         "scripts/redirectFromURL.js",
         "scripts/videoRecoGoals.js",
+        "scripts/verifyVideo.js",
         "scripts/content.js"]
     }
   ],

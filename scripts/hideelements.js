@@ -29,44 +29,35 @@ function hideYouTubeRecommendations() {
 }
 // YouTube Video Vorschläge ausblenden am Ende eines Videos
 // Funktion, um YouTube Videoempfehlungen am Ende eines Videos auszublenden
-function removeRecoOnVideo() {
-  if (window.location.href.includes("youtube.com/watch?v=")) {
-    console.log(
-      "Vorschläge werden überwacht und entfernt, sobald sie erscheinen."
-    );
+// Remove video recommendation displayed inside video view
+function compareVideoWithGoals() {
+  // Überprüfen, ob die aktuelle URL ein YouTube-Video ist
+  const isVideoPage = () =>
+    window.location.href.includes("youtube.com/watch?v=");
 
-    // Callback function to execute when mutations are observed
-    const observerCallback = function (mutationsList, observer) {
-      // Try to find the container with the class ".ytp-endscreen-content"
-      const targetContainer = document.querySelector(".ytp-endscreen-content");
-      console.log("Wir haben das ziel im Blick!")
+  // Funktion zum Ausblenden der Videoempfehlungen
+  const hideRecommendations = () => {
+    const distOnVid = document.querySelector(".ytp-endscreen-content");
+    if (distOnVid) {
+      distOnVid.style.display = "none";
+    }
+  };
 
-      if (targetContainer) {
-        // Find all elements with the class "ytp-videowall-still ytp-videowall-still-round-medium ytp-suggestion-set"
-        const elementsToRemove = targetContainer.querySelectorAll(
-          ".ytp-videowall-still.ytp-videowall-still-round-medium.ytp-suggestion-set"
-        );
-
-        // Iterate through each of those elements and remove them
-        elementsToRemove.forEach((element) => {
-          console.log("Vorschlag entfernt:", element);
-          element.remove();
-        });
-
-        // If the elements are found and removed, we can disconnect the observer
-        if (elementsToRemove.length > 0) {
-          observer.disconnect();
-        }
-      }
-    };
-
-    // Create a MutationObserver instance
-    const observer = new MutationObserver(observerCallback);
-
-    // Start observing changes in the body (or more specifically if you know the parent container)
-    observer.observe(document.body, { childList: true, subtree: true });
+  // Initiales Überprüfen der URL
+  if (isVideoPage()) {
+    hideRecommendations();
   }
+
+  // Observer, um Änderungen der URL zu überwachen
+  const observer = new MutationObserver(() => {
+    if (isVideoPage()) {
+      hideRecommendations();
+    }
+  });
+
+  // Observer-Konfiguration
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 // Call the function to start the observer
-removeRecoOnVideo();
+compareVideoWithGoals();
