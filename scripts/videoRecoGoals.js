@@ -9,71 +9,74 @@ function searchVideos(goals) {
     const storedGoals = res.doubleGoals || [];
     const storedVideos = res.videoData || [];
 
-    // TODO: Make the feed created by extension look originally like this from youtube itself
-    // TODO: Make it possible to save videos recommended
-    // TODO: Auf der Startliste anzeigen für welches Ziel welche Videos angezeigt werden und nicht flach alles auf einmal
     // Compare the current goals with stored goals
     if (JSON.stringify(storedGoals) === JSON.stringify(goals)) {
       console.log("Goals are the same, displaying cached videos.");
       console.log("Cached Videos:", storedVideos); // Debugging output
 
-      // Dieser Teil soll nach 5 Sekunden erst geladen werden
-      setTimeout(() => {
-        const primaryElement = document.getElementById("primary");
+      // Create a MutationObserver to watch for changes to the body
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes.length) {
+            const primaryElement = document.getElementById("primary");
+            if (primaryElement) {
+              // Clear existing content
+              primaryElement.innerHTML = "";
 
-        // Überprüfe, ob das primäre Element existiert
-        if (!primaryElement) {
-          console.error("Element mit ID 'primary' wurde nicht gefunden.");
-          return; // Beende die Funktion, wenn das Element nicht existiert
-        }
+              const videoContainer = document.createElement("div");
+              videoContainer.style.marginTop = "1rem";
+              videoContainer.style.marginLeft = "1rem";
+              videoContainer.style.display = "flex";
+              videoContainer.style.flexWrap = "wrap";
+              videoContainer.style.gap = "16px";
+              videoContainer.style.justifyContent = "flex-start";
 
-        primaryElement.innerHTML = ""; // Clear existing content
+              storedVideos.forEach((video) => {
+                const videoElement = document.createElement("div");
+                videoElement.style.flex = "1 1 300px";
+                videoElement.style.maxWidth = "315px";
+                videoElement.style.borderRadius = "8px";
+                videoElement.style.overflow = "hidden";
+                videoElement.style.boxShadow =
+                  "0px 0px 10px 0px rgba(255, 255, 255, 0.8)";
 
-        const videoContainer = document.createElement("div");
-        videoContainer.style.marginTop = "1rem";
-        videoContainer.style.marginLeft = "1rem";
-        videoContainer.style.display = "flex";
-        videoContainer.style.flexWrap = "wrap";
-        videoContainer.style.gap = "16px";
-        videoContainer.style.justifyContent = "flex-start";
+                // Add hover effect styles
+                videoElement.style.transition =
+                  "background-color 0.5s ease-in-out"; // Transition for smoother effect
 
-        storedVideos.forEach((video) => {
-          const videoElement = document.createElement("div");
-          videoElement.style.flex = "1 1 300px";
-          videoElement.style.maxWidth = "315px";
-          videoElement.style.borderRadius = "8px";
-          videoElement.style.overflow = "hidden";
-          videoElement.style.boxShadow =
-            "0px 0px 10px 0px rgba(255, 255, 255, 0.8)";
+                videoElement.innerHTML = `
+                  <a title='${video.description}' style='text-decoration:none;' href="${video.url}" target="_blank">
+                    <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}">
+                    <h3 style="color: white;margin-left:0.5rem;">${video.title}</h3>
+                    <p style="color: white;margin-left:0.5rem;">${video.description}</p>
+                  </a>
+                `;
 
-          // Add hover effect styles
-          videoElement.style.transition = "background-color 0.5s ease-in-out"; // Transition for smoother effect
+                // Add event listeners to the anchor element (a)
+                const anchorElement = videoElement.querySelector("a");
+                anchorElement.style.color = "black"; // Set default text color for the anchor
 
-          videoElement.innerHTML = `
-            <a title='${video.description}' style='text-decoration:none;' href="${video.url}" target="_blank">
-              <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}">
-              <h3 style="color: white;margin-left:0.5rem;">${video.title}</h3>
-              <p style="color: white;margin-left:0.5rem;">${video.description}</p>
-            </a>
-          `;
+                anchorElement.addEventListener("mouseover", () => {
+                  videoElement.style.backgroundColor = "#484848";
+                });
+                anchorElement.addEventListener("mouseout", () => {
+                  videoElement.style.backgroundColor = "black";
+                });
 
-          // Add event listeners to the anchor element (a)
-          const anchorElement = videoElement.querySelector("a");
+                videoContainer.appendChild(videoElement);
+              });
 
-          anchorElement.style.color = "black"; // Set default text color for the anchor
+              primaryElement.appendChild(videoContainer);
 
-          anchorElement.addEventListener("mouseover", () => {
-            videoElement.style.backgroundColor = "#484848";
-          });
-          anchorElement.addEventListener("mouseout", () => {
-            videoElement.style.backgroundColor = "black";
-          });
-
-          videoContainer.appendChild(videoElement);
+              // Stop observing after the primary element is found and updated
+              observer.disconnect();
+            }
+          }
         });
+      });
 
-        primaryElement.appendChild(videoContainer);
-      }, 200); // 5000 Millisekunden = 5 Sekunden
+      // Start observing the body for changes
+      observer.observe(document.body, { childList: true, subtree: true });
     } else {
       const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
       const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
