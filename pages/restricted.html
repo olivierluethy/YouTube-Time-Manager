@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="../icon/icon.png" />
-    <script src="restricted.js"></script>
+    <script src="restricted.js" defer></script>
     <title>Access Denied</title>
     <style>
       body {
@@ -23,6 +23,10 @@
         box-shadow: 0px 10px 20px rgb(255, 255, 255),
           0px 10px 15px rgb(255, 255, 255), 0px 10px 10px rgb(255, 255, 255);
       }
+      span {
+        font-style: italic;
+        font-weight: bold;
+      }
       svg {
         display: block;
         margin: auto;
@@ -35,7 +39,7 @@
       <h1><strong>YouTube Access Denied</strong></h1>
       <h3 id="banMessage">
         You have been banned from YouTube for exceeding your viewing limit. You will
-        need to wait <span id="remainingTime">{time}</span> until you can access it
+        need to wait for <span id="remainingTime">Time</span> you can access it
         again. Please remember why you downloaded the extension and what problem you
         were trying to solve, we are doing this for your own good.
       </h3>

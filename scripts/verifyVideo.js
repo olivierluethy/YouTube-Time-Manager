@@ -38,9 +38,6 @@ function compareVideoWithGoals() {
               const minutesRemaining = Math.ceil(
                 (blockUntil - currentTime) / 60000
               );
-              alert(
-                `You are blocked for ${minutesRemaining} more minute(s). Focus on your goals!`
-              );
 
               // Save the remaining block time to Chrome storage
               chrome.storage.sync.set(
@@ -104,18 +101,31 @@ function compareVideoWithGoals() {
                   const blockUntilTime =
                     new Date().getTime() + BLOCK_DURATION_MINUTES * 60000;
 
-                  // Save the blockUntil time to chrome storage
-                  chrome.storage.sync.set(
-                    { blockUntil: blockUntilTime },
-                    function () {
-                      alert(
-                        `You have watched too many videos that don't match your goals. You are blocked for ${BLOCK_DURATION_MINUTES} minutes.`
-                      );
+                  // Überprüfe, ob der Alert bereits gezeigt wurde
+                  chrome.storage.sync.get(["alertShown"], function (result) {
+                    const alertShown = result.alertShown || false; // Fallback falls der Wert noch nicht existiert
 
-                      // Send a message to the background script to redirect the user
-                      chrome.runtime.sendMessage({ action: "blockSite" });
+                    if (!alertShown) {
+                      // Zeige den Alert nur, wenn er noch nicht gezeigt wurde
+                      chrome.storage.sync.set(
+                        { alertShown: true, blockUntil: blockUntilTime },
+                        function () {
+                          alert(
+                            `You have watched too many videos that don't match your goals. You are blocked for ${BLOCK_DURATION_MINUTES} minutes.`
+                          );
+                          chrome.runtime.sendMessage({ action: "blockSite" });
+                        }
+                      );
+                    } else {
+                      // Blockiere die Seite direkt, wenn der Alert bereits gezeigt wurde
+                      chrome.storage.sync.set(
+                        { blockUntil: blockUntilTime },
+                        function () {
+                          chrome.runtime.sendMessage({ action: "blockSite" });
+                        }
+                      );
                     }
-                  );
+                  });
                 }
               });
             }
