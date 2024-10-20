@@ -21,9 +21,13 @@ function updateRemainingTime() {
         const formattedSeconds =
           secondsRemaining < 10 ? "0" + secondsRemaining : secondsRemaining;
 
-        // Update the UI with the remaining time without leading zeros for minutes
+        // Update the UI with the remaining time, omitting minutes if they are 0
         if (remainingTimeElement) {
-          remainingTimeElement.textContent = `${minutesRemaining}m ${formattedSeconds}s`;
+          if (minutesRemaining > 0) {
+            remainingTimeElement.textContent = `${minutesRemaining}m ${formattedSeconds}s`;
+          } else {
+            remainingTimeElement.textContent = `${formattedSeconds}s`;
+          }
         }
       } else {
         clearInterval(intervalId); // Stop the interval if no block time is set or expired
