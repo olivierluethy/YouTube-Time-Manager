@@ -8,8 +8,10 @@ function compareVideoWithGoals() {
     const titleElement = document.querySelector(
       "yt-formatted-string.style-scope.ytd-watch-metadata"
     );
-    if (titleElement) {
+    const descriptionElement = document.getElementById("description-inner");
+    if (titleElement && descriptionElement) {
       const title = titleElement.innerHTML;
+      const description = descriptionElement.innerText;
 
       if (title && !messagesDisplayed) {
         chrome.storage.sync.get(
@@ -64,16 +66,23 @@ function compareVideoWithGoals() {
                 return;
               }
 
-              // Normalize the title for comparison (case insensitive)
+              // Normalize the title and description for comparison (case insensitive)
               const normalizedTitle = title.toLowerCase();
+              const normalizedDescription = description.toLowerCase();
 
-              // Split the title into individual words (this helps with exact word matching)
+              // Split the title and description into individual words (this helps with exact word matching)
               const titleWords = normalizedTitle.split(/\s+/);
+              const descriptionWords = normalizedDescription.split(/\s+/);
 
-              // Check if any goal word matches a word in the title
+              // Check if any goal word matches a word in the title or description
               const goalMatches = goals.some((goal) => {
                 const normalizedGoal = goal.toLowerCase();
-                return titleWords.includes(normalizedGoal);
+
+                // Check if the goal matches a word in the title or description
+                return (
+                  titleWords.includes(normalizedGoal) ||
+                  descriptionWords.includes(normalizedGoal)
+                );
               });
 
               if (goalMatches) {
@@ -104,8 +113,8 @@ function compareVideoWithGoals() {
                     wasteTimeCounter
                   );
 
-                  // Check if the counter exceeds the limit (e.g., 10)
-                  if (wasteTimeCounter >= 10) {
+                  // Check if the counter exceeds the limit of 5
+                  if (wasteTimeCounter >= 5) {
                     const blockUntilTime =
                       new Date().getTime() + BLOCK_DURATION_MINUTES * 60000;
 
@@ -180,8 +189,8 @@ function monitorURLChange() {
       const currentTime = new Date().getTime();
 
       // If the wasteTimeCounter exceeds the limit and block time is active, block the site
-      if (wasteTimeCounter >= 10 && blockUntil > currentTime) {
-        // Block YouTube (both video and non-video URLs) if wasteTimeCounter >= 10
+      if (wasteTimeCounter >= 5 && blockUntil > currentTime) {
+        // Block YouTube (both video and non-video URLs) if wasteTimeCounter >= 5
         chrome.runtime.sendMessage({ action: "blockSite" });
       } else {
         // Check if the URL has changed
@@ -192,8 +201,8 @@ function monitorURLChange() {
             console.log("Video URL changed, checking goals.");
             compareVideoWithGoals();
           } else if (currentURL.includes("youtube.com")) {
-            // If it's any other YouTube page and wasteTimeCounter is >= 10, block the site
-            if (wasteTimeCounter >= 10) {
+            // If it's any other YouTube page and wasteTimeCounter is >= 5, block the site
+            if (wasteTimeCounter >= 5) {
               chrome.runtime.sendMessage({ action: "blockSite" });
             }
           }

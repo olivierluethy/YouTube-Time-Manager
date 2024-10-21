@@ -11,16 +11,16 @@
   <h4 align="center">Google Chrome extension to block YouTube video recommendations without affecting the visibility of open playlists</h4>
 
   <p align="center">
-    Here I'll explain how I developed the application called YouRecoHide
+    Here I'll explain how I developed the application called YouTube Disblock
     <br />
-    <a href="github.com/olivierluethy/YouRecoHide/blob/master/README.md"><strong>Explore the docs »</strong></a>
+    <a href="github.com/olivierluethy/YouTube-Disblock/blob/master/README.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/olivierluethy/YouRecoHide/">View Demo</a>
+    <a href="https://github.com/olivierluethy/YouTube-Disblock/">View Demo</a>
     ·
-    <a href="https://github.com/olivierluethy/YouRecoHide/issues">Report Bug</a>
+    <a href="https://github.com/olivierluethy/YouTube-Disblock/issues">Report Bug</a>
     ·
-    <a href="https://github.com/olivierluethy/YouRecoHide/issues">Request Feature</a>
+    <a href="https://github.com/olivierluethy/YouTube-Disblock/issues">Request Feature</a>
   </p>
 </p>
 
@@ -49,20 +49,20 @@
   </ol>
 </details>
 
-YouRecoHide is a simple yet effective Chrome extension that improves your focus by hiding YouTube recommendations, other users' playlists, and the tab list while you're watching videos. This ensures that you're not distracted by unrelated content and can focus on what's important.
+YouTube-Disblock is a simple yet effective Chrome extension that improves your focus by hiding YouTube recommendations, other users' playlists, and the tab list while you're watching videos. This ensures that you're not distracted by unrelated content and can focus on what's important.
 
 ## Features
 
 - 🏠 **Remove YouTube Feeds on the Home Page**  
   Clear out unnecessary content on your YouTube homepage by removing constant updates and recommendations. Maintain a clean and distraction-free environment for better focus.<br>
 - 🔥 **Remove the Discovery Section**  
-  Trending content can easily pull you away from your goals. YouRecoHide removes the discovery section, allowing you to avoid distractions and stay focused on what matters.<br>
+  Trending content can easily pull you away from your goals. YouTube-Disblock removes the discovery section, allowing you to avoid distractions and stay focused on what matters.<br>
 - 🔔 **Control Subscriptions Visibility**  
   Decide whether or not to display videos from channels you’ve subscribed to. Use the toggle within the extension’s popup window to switch visibility on or off, with clear text indicating what’s changed.<br>
 - 🛡️ **Smart Blocking for Trending Bypass Attempts**  
-  For users who might be tempted to visit the trending section manually, YouRecoHide steps in. If you try to access the trending section via the URL, the extension smartly redirects you to your subscriptions, ensuring a focused experience.<br>
+  For users who might be tempted to visit the trending section manually, YouTube-Disblock steps in. If you try to access the trending section via the URL, the extension smartly redirects you to your subscriptions, ensuring a focused experience.<br>
 - 🎥 **Keep Playlists Visible While Hiding Recommendations**  
-  Unlike other extensions that block recommendations and hide playlists, YouRecoHide maintains playlist visibility so you can easily switch between videos within your playlist while keeping distracting video suggestions out of sight.
+  Unlike other extensions that block recommendations and hide playlists, YouTube-Disblock maintains playlist visibility so you can easily switch between videos within your playlist while keeping distracting video suggestions out of sight.
 
 <div align="center">
 
@@ -137,4 +137,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Disclaimer
 
 I don't store any of your information. If you don't believe me, all the code is in this repo so you can check it out for yourself. The only data that is stored is on your own computer. This is necessary for Chrome to remember what you chose to hide when you refresh your page.
-YouRecoHide for YouTube is not affiliated with YouTube.
+YouTube-Disblock for YouTube is not affiliated with YouTube.
