@@ -43,7 +43,7 @@ function removeNotificationFromTitle() {
 }
 function noGoalStopper() {
   let isOnSearchPage = false; // Flag to track if we are on the search results page
-
+  let countWarnElement = 0;
   // Function to handle the visibility of search results and warnings
   const checkGoalsAndUpdateUI = () => {
     // Use setTimeout to delay execution by 250 milliseconds
@@ -82,56 +82,53 @@ function noGoalStopper() {
             filterButton.style.display = "none";
           }
 
-          const existingWarning = document.querySelector(".goal-warning");
+          const warningDiv = document.createElement("div");
+          warningDiv.className = "goal-warning";
+          warningDiv.style.cssText = `
+            text-align: center;
+            margin-top: auto;
+            margin-bottom: auto;
+          `;
 
+          const h1Element = document.createElement("h1");
+          h1Element.textContent = "Please define your goals first.";
+          h1Element.style.cssText = `
+            color: white;
+            font-size: 30px;
+          `;
+
+          const defineGoalsButton = document.createElement("button");
+          defineGoalsButton.textContent = "Define Goals";
+          defineGoalsButton.style.cssText = `
+            background-color: blue;
+            color: white;
+            padding: 18px 32px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0px 0px 29px 0px rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            margin-top: 20px;
+            transition-duration: 0.5s;
+          `;
+
+          defineGoalsButton.addEventListener("mouseover", function () {
+            defineGoalsButton.style.backgroundColor = "white";
+            defineGoalsButton.style.color = "blue";
+            defineGoalsButton.style.transform = "scale(1.05)";
+          });
+
+          defineGoalsButton.addEventListener("mouseout", function () {
+            defineGoalsButton.style.backgroundColor = "blue";
+            defineGoalsButton.style.color = "white";
+            defineGoalsButton.style.transform = "scale(1)";
+          });
+          defineGoalsButton.title = "Click here to go to the goals page.";
+
+          defineGoalsButton.addEventListener("click", function () {
+            chrome.runtime.sendMessage({ action: "openGoalsPage" });
+          });
           // Create warning and button if they do not exist
-          if (mainElement && !existingWarning) {
-            const warningDiv = document.createElement("div");
-            warningDiv.className = "goal-warning";
-            warningDiv.style.cssText = `
-              text-align: center;
-              margin-top: auto;
-              margin-bottom: auto;
-            `;
-
-            const h1Element = document.createElement("h1");
-            h1Element.textContent = "Please define your goals first.";
-            h1Element.style.cssText = `
-              color: white;
-              font-size: 30px;
-            `;
-
-            const defineGoalsButton = document.createElement("button");
-            defineGoalsButton.textContent = "Define Goals";
-            defineGoalsButton.style.cssText = `
-              background-color: blue;
-              color: white;
-              padding: 18px 32px;
-              cursor: pointer;
-              border: none;
-              box-shadow: 0px 0px 29px 0px rgba(255, 255, 255, 0.8);
-              font-size: 15px;
-              margin-top: 20px;
-              transition-duration: 0.5s;
-            `;
-
-            defineGoalsButton.addEventListener("mouseover", function () {
-              defineGoalsButton.style.backgroundColor = "white";
-              defineGoalsButton.style.color = "blue";
-              defineGoalsButton.style.transform = "scale(1.05)";
-            });
-
-            defineGoalsButton.addEventListener("mouseout", function () {
-              defineGoalsButton.style.backgroundColor = "blue";
-              defineGoalsButton.style.color = "white";
-              defineGoalsButton.style.transform = "scale(1)";
-            });
-            defineGoalsButton.title = "Click here to go to the goals page.";
-
-            defineGoalsButton.addEventListener("click", function () {
-              chrome.runtime.sendMessage({ action: "openGoalsPage" });
-            });
-
+          if (countWarnElement == 0) {
             warningDiv.appendChild(h1Element);
             warningDiv.appendChild(defineGoalsButton);
             mainElement.insertBefore(warningDiv, mainElement.firstChild);
@@ -143,6 +140,7 @@ function noGoalStopper() {
             if (discover) {
               discover.style.display = "none";
             }
+            countWarnElement++;
           }
         } else {
           // If goals are defined, show search results
@@ -171,7 +169,7 @@ function noGoalStopper() {
           }
         }
       });
-    }, 250); // Delay of 250 milliseconds
+    }, 600);
   };
 
   // Initial check for the URL
