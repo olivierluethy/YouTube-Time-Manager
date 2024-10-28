@@ -1,252 +1,86 @@
 /* YouTube API interaction for feed results */
-function searchVideos() {
-  // Create a MutationObserver to watch for changes to the document
-  const observer = new MutationObserver((mutations) => {
-    // Check if the primary element exists on the page
-    const primaryElement = document.getElementById("primary");
+function searchVideos(goals) {
+  if (!goals || goals.length === 0) {
+    console.log("No goals provided. Exiting the function.");
+    return;
+  }
 
-    if (primaryElement) {
-      // Once the primary element is available, we stop observing
-      observer.disconnect();
+  chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
+    const storedGoals = res.doubleGoals || [];
+    const storedVideos = res.videoData || {};
 
-      // Define hardcoded goals with video recommendations
-      const hardcodedGoals = {
-        learnjava: [
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-        ],
-        walking: [
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-        ],
-        laughing: [
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-        ],
-        hunting: [
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-        ],
-        jogging: [
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-        ],
-        speaking: [
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-          {
-            title: "Learning JavaScript Basics",
-            url: "https://www.youtube.com/watch?v=fSROf5ZKNz8",
-            description: "An introduction to JavaScript basics and syntax.",
-            thumbnail:
-              "https://i.ytimg.com/an_webp/QkCa--fyGjA/mqdefault_6s.webp?du=3000&sqp=CIC38rgG&rs=AOn4CLCWYpvJ4vusJ9_BiavtpGAoq3q9Qw",
-          },
-        ],
-      };
+    const goalVideos = { ...storedVideos }; // Initialize goalVideos with stored data
 
-      // Store all hardcoded video data in Chrome Storage at once
-      chrome.storage.sync.set({ goalVideos: hardcodedGoals }, () => {
-        console.log("All hardcoded video data stored.");
+    if (JSON.stringify(storedGoals) === JSON.stringify(goals)) {
+      console.log("Goals are the same, displaying cached videos.");
+      displayVideos(goalVideos);
+      return;
+    }
+
+    const goalsToAdd = goals.filter((goal) => !storedGoals.includes(goal));
+    const goalsToRemove = storedGoals.filter(
+      (storedGoal) => !goals.includes(storedGoal)
+    );
+
+    // Handle added goals by fetching video data
+    if (goalsToAdd.length > 0) {
+      console.log("Goals to add:", goalsToAdd);
+
+      // Fetch videos for each new goal and add to goalVideos
+      goalsToAdd.forEach((goal) => {
+        const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+          goal
+        )}&type=video&key=${apiKey}`;
+
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            const videos = data.items.map((item) => ({
+              title: item.snippet.title,
+              url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+              description: item.snippet.description,
+              thumbnail: item.snippet.thumbnails.medium.url,
+            }));
+            goalVideos[goal] = videos;
+
+            // Save updated videos and goals to storage
+            const updatedGoals = [...storedGoals, ...goalsToAdd];
+            chrome.storage.sync.set(
+              { doubleGoals: updatedGoals, videoData: goalVideos },
+              () => {
+                console.log(
+                  "Updated stored goals and videos:",
+                  updatedGoals,
+                  goalVideos
+                );
+                displayVideos(goalVideos);
+              }
+            );
+          })
+          .catch((error) => {
+            console.error("Error fetching videos:", error);
+          });
       });
+    }
 
-      // Display hardcoded videos for all goals immediately
-      displayVideos(hardcodedGoals);
+    // Handle removed goals by deleting from goalVideos
+    if (goalsToRemove.length > 0) {
+      console.log("Goals to remove:", goalsToRemove);
+      goalsToRemove.forEach((goal) => delete goalVideos[goal]);
+
+      const updatedGoals = storedGoals.filter(
+        (storedGoal) => !goalsToRemove.includes(storedGoal)
+      );
+      chrome.storage.sync.set(
+        { doubleGoals: updatedGoals, videoData: goalVideos },
+        () => {
+          console.log("Updated stored goals after removal:", updatedGoals);
+          displayVideos(goalVideos);
+        }
+      );
     }
   });
-
-  // Start observing the entire document for added nodes to detect when 'primary' loads
-  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 // Function to display videos grouped by goal
