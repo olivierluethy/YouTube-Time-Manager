@@ -1,86 +1,111 @@
-/* YouTube API interaction for feed results */
 function searchVideos(goals) {
   if (!goals || goals.length === 0) {
     console.log("No goals provided. Exiting the function.");
     return;
   }
 
-  chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
-    const storedGoals = res.doubleGoals || [];
-    const storedVideos = res.videoData || {};
+  // Create a MutationObserver to watch for changes to the body
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.addedNodes.length) {
+        // Check if the body has been loaded
+        const bodyLoaded = document.body && document.body.childNodes.length > 0;
 
-    const goalVideos = { ...storedVideos }; // Initialize goalVideos with stored data
+        if (bodyLoaded) {
+          // Stop observing after the body is loaded
+          observer.disconnect();
 
-    if (JSON.stringify(storedGoals) === JSON.stringify(goals)) {
-      console.log("Goals are the same, displaying cached videos.");
-      displayVideos(goalVideos);
-      return;
-    }
+          // Proceed with fetching goals and videos
+          chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
+            const storedGoals = res.doubleGoals || {};
+            const storedVideos = res.videoData || {};
 
-    const goalsToAdd = goals.filter((goal) => !storedGoals.includes(goal));
-    const goalsToRemove = storedGoals.filter(
-      (storedGoal) => !goals.includes(storedGoal)
-    );
+            const goalVideos = { ...storedVideos }; // Initialize goalVideos with stored data
 
-    // Handle added goals by fetching video data
-    if (goalsToAdd.length > 0) {
-      console.log("Goals to add:", goalsToAdd);
+            // Convert the goals array into an object for easier comparison
+            const goalsObject = {};
+            goals.forEach((goal) => (goalsObject[goal] = true));
 
-      // Fetch videos for each new goal and add to goalVideos
-      goalsToAdd.forEach((goal) => {
-        const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-          goal
-        )}&type=video&key=${apiKey}`;
-
-        fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
-            const videos = data.items.map((item) => ({
-              title: item.snippet.title,
-              url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-              description: item.snippet.description,
-              thumbnail: item.snippet.thumbnails.medium.url,
-            }));
-            goalVideos[goal] = videos;
-
-            // Save updated videos and goals to storage
-            const updatedGoals = [...storedGoals, ...goalsToAdd];
-            chrome.storage.sync.set(
-              { doubleGoals: updatedGoals, videoData: goalVideos },
-              () => {
-                console.log(
-                  "Updated stored goals and videos:",
-                  updatedGoals,
-                  goalVideos
-                );
-                displayVideos(goalVideos);
-              }
+            // Check if storedGoals have changed
+            const goalsToAdd = goals.filter((goal) => !storedGoals[goal]);
+            const goalsToRemove = Object.keys(storedGoals).filter(
+              (storedGoal) => !goalsObject[storedGoal]
             );
-          })
-          .catch((error) => {
-            console.error("Error fetching videos:", error);
+
+            // Handle added goals by fetching video data
+            if (goalsToAdd.length > 0) {
+              console.log("Goals to add:", goalsToAdd);
+
+              // Fetch videos for each new goal and add to goalVideos
+              goalsToAdd.forEach((goal) => {
+                const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+                  goal
+                )}&type=video&key=${apiKey}`;
+
+                fetch(url)
+                  .then((response) => response.json())
+                  .then((data) => {
+                    const videos = data.items.map((item) => ({
+                      title: item.snippet.title,
+                      url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+                      description: item.snippet.description,
+                      thumbnail: item.snippet.thumbnails.medium.url,
+                    }));
+                    goalVideos[goal] = videos;
+                    storedGoals[goal] = videos; // Update storedGoals with new videos
+
+                    // Save updated videos and goals to storage
+                    chrome.storage.sync.set(
+                      { doubleGoals: storedGoals, videoData: goalVideos },
+                      () => {
+                        console.log(
+                          "Updated stored goals and videos:",
+                          storedGoals,
+                          goalVideos
+                        );
+                        displayVideos(goalVideos);
+                      }
+                    );
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching videos:", error);
+                  });
+              });
+            }
+
+            // Handle removed goals by deleting from goalVideos
+            if (goalsToRemove.length > 0) {
+              console.log("Goals to remove:", goalsToRemove);
+              goalsToRemove.forEach((goal) => {
+                delete goalVideos[goal];
+                delete storedGoals[goal]; // Also remove from storedGoals
+              });
+
+              // Update the storage with the new goals
+              const updatedGoals = Object.keys(storedGoals);
+              chrome.storage.sync.set(
+                { doubleGoals: updatedGoals, videoData: goalVideos },
+                () => {
+                  console.log(
+                    "Updated stored goals after removal:",
+                    updatedGoals
+                  );
+                  displayVideos(goalVideos);
+                }
+              );
+            } else {
+              // If no goals are removed, just display the videos
+              displayVideos(goalVideos);
+            }
           });
-      });
-    }
-
-    // Handle removed goals by deleting from goalVideos
-    if (goalsToRemove.length > 0) {
-      console.log("Goals to remove:", goalsToRemove);
-      goalsToRemove.forEach((goal) => delete goalVideos[goal]);
-
-      const updatedGoals = storedGoals.filter(
-        (storedGoal) => !goalsToRemove.includes(storedGoal)
-      );
-      chrome.storage.sync.set(
-        { doubleGoals: updatedGoals, videoData: goalVideos },
-        () => {
-          console.log("Updated stored goals after removal:", updatedGoals);
-          displayVideos(goalVideos);
         }
-      );
-    }
+      }
+    });
   });
+
+  // Start observing the entire document for added nodes
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 // Function to display videos grouped by goal
