@@ -53,13 +53,24 @@ function searchVideos(goals) {
               return fetch(url)
                 .then((response) => response.json())
                 .then((data) => {
-                  const videos = data.items.map((item) => ({
-                    videoId: item.id.videoId,
-                    title: item.snippet.title,
-                    url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-                    description: item.snippet.description,
-                    thumbnail: item.snippet.thumbnails.medium.url,
-                  }));
+                  const shortsRegex = /#?short/i; // Regular expression to match "short", "shorts", "#short", "#shorts" etc.
+
+                  const videos = data.items
+                    .map((item) => ({
+                      videoId: item.id.videoId,
+                      title: item.snippet.title,
+                      url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+                      description: item.snippet.description,
+                      thumbnail: item.snippet.thumbnails.medium.url,
+                    }))
+                    .filter((video) => {
+                      // Check if title or description contains the regex pattern
+                      return (
+                        !shortsRegex.test(video.title) &&
+                        !shortsRegex.test(video.description)
+                      );
+                    });
+
                   goalVideos[goal] = videos; // Store videos for the goal
                   storedGoals[goal] = true; // Mark goal as stored
                 });
@@ -249,11 +260,5 @@ function displayVideos(goalVideos) {
 
     goalSection.appendChild(videoContainer);
     primaryElement.appendChild(goalSection);
-  }
-}
-
-function handleAPIErrors(error) {
-  if (error.code === 403 || error.status === "PERMISSION_DENIED") {
-    // Handle permissions and redirect logic
   }
 }
