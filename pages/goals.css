@@ -10,6 +10,7 @@ input[type="text"] {
   width: 50%;
   padding: 12px 20px;
   margin: 16px 0;
+  text-align: center;
   border: none;
   box-sizing: border-box;
   box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
@@ -34,42 +35,45 @@ h1 {
   font-size: 50px;
 }
 #goals {
-  font-size: 13px;
+  font-size: 20px;
 }
 span.remove-goal {
+  display: inline-block;
   margin-left: 1rem;
   color: red;
+  transition: all 0.5s ease;
 }
 .remove-goal:hover {
   cursor: pointer;
+  transform: scale(1.5);
 }
 .quote {
   margin-left: auto;
   margin-right: auto;
   width: 50%;
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
   font-size: 1.2em; /* Slightly smaller font */
   font-style: italic;
   color: #555;
-  border-left: 3px solid #007ACC; /* Thinner border */
+  border-left: 3px solid #007acc; /* Thinner border */
   padding: 8px 12px; /* Reduced padding */
   background-color: #fafafa; /* Subtler background color */
   position: relative;
 }
 
 .quote::before {
-  content: '“';
+  content: "“";
   font-size: 2em; /* Slightly smaller quotes */
-  color: #007ACC;
+  color: #007acc;
   position: absolute;
   left: -8px;
   top: -5px;
 }
 
 .quote::after {
-  content: '”';
+  content: "”";
   font-size: 2em;
-  color: #007ACC;
+  color: #007acc;
   position: absolute;
   right: -8px;
   bottom: -5px;

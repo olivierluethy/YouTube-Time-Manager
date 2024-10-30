@@ -38,6 +38,7 @@ function searchVideos(goals) {
           return; // Exit if no changes
         }
 
+        // TODO: What happens if there are no goals? it should display define goals and handle also api errors
         // Handle added goals by fetching video data
         if (goalsToAdd.length > 0) {
           console.log("Goals to add:", goalsToAdd);

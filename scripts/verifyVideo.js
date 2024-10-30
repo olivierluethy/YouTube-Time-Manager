@@ -74,9 +74,14 @@ function compareVideoWithGoals() {
               const titleWords = normalizedTitle.split(/\s+/);
               const descriptionWords = normalizedDescription.split(/\s+/);
 
+              console.log("The video title: " + titleWords);
+              console.log("Video description: " + descriptionWords);
+
               // Check if any goal word matches a word in the title or description
               const goalMatches = goals.some((goal) => {
                 const normalizedGoal = goal.toLowerCase();
+
+                console.log("The Goals: " + goal);
 
                 // Check if the goal matches a word in the title or description
                 return (
@@ -119,30 +124,68 @@ function compareVideoWithGoals() {
                       new Date().getTime() + BLOCK_DURATION_MINUTES * 60000;
 
                     // Check if the alert has already been shown
-                    chrome.storage.sync.get(["alertShown"], function (result) {
-                      const alertShown = result.alertShown || false;
+                    chrome.storage.sync.get(
+                      ["alertShown", "dailyWasteTimeCounter"],
+                      function (result) {
+                        const alertShown = result.alertShown || false;
+                        const dailyWasteTimeCounter =
+                          result.dailyWasteTimeCounter || {
+                            date: "",
+                            count: 0,
+                          };
 
-                      if (!alertShown) {
-                        // Show alert only if it hasn't been shown
-                        chrome.storage.sync.set(
-                          { alertShown: true, blockUntil: blockUntilTime },
-                          function () {
-                            alert(
-                              `You have watched too many videos that don't match your goals. You are blocked for ${BLOCK_DURATION_MINUTES} minutes.`
-                            );
-                            chrome.runtime.sendMessage({ action: "blockSite" });
+                        const currentDate = new Date()
+                          .toISOString()
+                          .split("T")[0]; // Get the current date in YYYY-MM-DD format
+
+                        // Check if the wasteTimeCounter has reached 5
+                        if (wasteTimeCounter >= 5) {
+                          // Check if the date has changed
+                          if (dailyWasteTimeCounter.date !== currentDate) {
+                            // Reset the count for the new day
+                            dailyWasteTimeCounter.date = currentDate;
+                            dailyWasteTimeCounter.count = 1; // Start counting for the new day
+                          } else {
+                            // Increment the count for the current day
+                            dailyWasteTimeCounter.count++;
                           }
-                        );
-                      } else {
-                        // Block the site directly if the alert has already been shown
-                        chrome.storage.sync.set(
-                          { blockUntil: blockUntilTime },
-                          function () {
-                            chrome.runtime.sendMessage({ action: "blockSite" });
-                          }
-                        );
+
+                          // Update storage with the new dailyWasteTimeCounter
+                          chrome.storage.sync.set(
+                            { dailyWasteTimeCounter: dailyWasteTimeCounter },
+                            function () {
+                              if (!alertShown) {
+                                // Show alert only if it hasn't been shown
+                                chrome.storage.sync.set(
+                                  {
+                                    alertShown: true,
+                                    blockUntil: blockUntilTime,
+                                  },
+                                  function () {
+                                    alert(
+                                      `You have watched too many videos that don't match your goals. You are blocked for ${BLOCK_DURATION_MINUTES} minutes.`
+                                    );
+                                    chrome.runtime.sendMessage({
+                                      action: "blockSite",
+                                    });
+                                  }
+                                );
+                              } else {
+                                // Block the site directly if the alert has already been shown
+                                chrome.storage.sync.set(
+                                  { blockUntil: blockUntilTime },
+                                  function () {
+                                    chrome.runtime.sendMessage({
+                                      action: "blockSite",
+                                    });
+                                  }
+                                );
+                              }
+                            }
+                          );
+                        }
                       }
-                    });
+                    );
                   }
                 });
               }
@@ -186,34 +229,34 @@ function monitorURLChange() {
     chrome.storage.sync.get(["wasteTimeCounter", "blockUntil"], (result) => {
       const wasteTimeCounter = result.wasteTimeCounter || 0;
       const blockUntil = result.blockUntil || 0;
-      const currentTime = new Date().getTime();
+      const currentTime = Date.now(); // Use Date.now() for better performance
 
-      // If the wasteTimeCounter exceeds the limit and block time is active, block the site
-      if (wasteTimeCounter >= 5 && blockUntil > currentTime) {
-        // Block YouTube (both video and non-video URLs) if wasteTimeCounter >= 5
-        chrome.runtime.sendMessage({ action: "blockSite" });
-      } else {
-        // Check if the URL has changed
-        if (window.location.href !== currentURL) {
-          currentURL = window.location.href;
+      // Check if the URL has changed
+      if (window.location.href !== currentURL) {
+        currentURL = window.location.href;
 
-          if (currentURL.includes("youtube.com/watch?v=")) {
-            console.log("Video URL changed, checking goals.");
-            compareVideoWithGoals();
-          } else if (currentURL.includes("youtube.com")) {
-            // If it's any other YouTube page and wasteTimeCounter is >= 5, block the site
-            if (wasteTimeCounter >= 5) {
-              chrome.runtime.sendMessage({ action: "blockSite" });
-            }
-          }
+        // Block the site if wasteTimeCounter is 5 or more
+        if (wasteTimeCounter >= 5) {
+          chrome.runtime.sendMessage({ action: "blockSite" });
+          return; // Exit early since we are blocking access
         }
+
+        // Check for specific YouTube video URL changes
+        if (currentURL.includes("youtube.com/watch?v=")) {
+          console.log("Video URL changed, checking goals.");
+          compareVideoWithGoals();
+        }
+      }
+
+      // Additional block logic based on blockUntil
+      if (wasteTimeCounter >= 5 && blockUntil > currentTime) {
+        chrome.runtime.sendMessage({ action: "blockSite" });
       }
     });
   });
 
   // Observe changes to the <body> element to detect URL changes (or <title> tag changes)
-  const config = { childList: true, subtree: true };
-  observer.observe(document.body, config);
+  observer.observe(document.body, { childList: true, subtree: true });
 
   // Disconnect the observer when necessary (optional cleanup)
   window.addEventListener("beforeunload", () => {

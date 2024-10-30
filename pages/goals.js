@@ -21,7 +21,7 @@ function addGoalToList(goalText) {
   var removeButton = document.createElement("span");
   removeButton.textContent = "X";
   removeButton.className = "remove-goal";
-  removeButton.title="Remove goal";
+  removeButton.title="Remove this goal";
   removeButton.onclick = function () {
     removeGoal(goalText, listItem);
   };
