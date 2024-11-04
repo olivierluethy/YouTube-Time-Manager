@@ -24,3 +24,24 @@ svg {
   margin: auto;
   /* https://stackoverflow.com/questions/8639383/how-do-i-center-a-svg-in-a-div */
 }
+
+.statistics table {
+  font-family: Arial, sans-serif;
+  border: 1px solid white;
+  box-shadow: white 0px 0px 20px;
+  border-radius: 8px; /* optional, to add rounded corners */
+}
+
+.statistics th,
+.statistics td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.statistics tr {
+  text-align: left;
+}
+
+.statistics thead {
+  color: white;
+}

@@ -129,10 +129,7 @@ function compareVideoWithGoals() {
                       function (result) {
                         const alertShown = result.alertShown || false;
                         const dailyWasteTimeCounter =
-                          result.dailyWasteTimeCounter || {
-                            date: "",
-                            count: 0,
-                          };
+                          result.dailyWasteTimeCounter || {}; // Change here
 
                         const currentDate = new Date()
                           .toISOString()
@@ -141,13 +138,12 @@ function compareVideoWithGoals() {
                         // Check if the wasteTimeCounter has reached 5
                         if (wasteTimeCounter >= 5) {
                           // Check if the date has changed
-                          if (dailyWasteTimeCounter.date !== currentDate) {
-                            // Reset the count for the new day
-                            dailyWasteTimeCounter.date = currentDate;
-                            dailyWasteTimeCounter.count = 1; // Start counting for the new day
+                          if (!dailyWasteTimeCounter[currentDate]) {
+                            // Initialize the count for the new day
+                            dailyWasteTimeCounter[currentDate] = 1; // Start counting for the new day
                           } else {
                             // Increment the count for the current day
-                            dailyWasteTimeCounter.count++;
+                            dailyWasteTimeCounter[currentDate]++;
                           }
 
                           // Update storage with the new dailyWasteTimeCounter
@@ -219,55 +215,25 @@ function compareVideoWithGoals() {
     subtree: true, // Watch all levels in the DOM tree
   });
 }
-
-// Detect when the URL changes (even without reload)
-function monitorURLChange() {
-  let currentURL = window.location.href;
-
-  // Create a MutationObserver to detect changes in the document
-  const observer = new MutationObserver(() => {
-    chrome.storage.sync.get(["wasteTimeCounter", "blockUntil"], (result) => {
-      const wasteTimeCounter = result.wasteTimeCounter || 0;
-      const blockUntil = result.blockUntil || 0;
-      const currentTime = Date.now(); // Use Date.now() for better performance
-
-      // Check if the URL has changed
-      if (window.location.href !== currentURL) {
-        currentURL = window.location.href;
-
-        // Block the site if wasteTimeCounter is 5 or more
-        if (wasteTimeCounter >= 5) {
-          chrome.runtime.sendMessage({ action: "blockSite" });
-          return; // Exit early since we are blocking access
-        }
-
-        // Check for specific YouTube video URL changes
-        if (currentURL.includes("youtube.com/watch?v=")) {
-          console.log("Video URL changed, checking goals.");
-          compareVideoWithGoals();
-        }
-      }
-
-      // Additional block logic based on blockUntil
-      if (wasteTimeCounter >= 5 && blockUntil > currentTime) {
-        chrome.runtime.sendMessage({ action: "blockSite" });
-      }
-    });
-  });
-
-  // Observe changes to the <body> element to detect URL changes (or <title> tag changes)
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Disconnect the observer when necessary (optional cleanup)
-  window.addEventListener("beforeunload", () => {
-    observer.disconnect();
-  });
-}
-
 if (window.location.href.includes("youtube.com/watch?v=")) {
   // Call the function to start the observer
   compareVideoWithGoals();
 }
+// https://chatgpt.com/share/67288f3f-2aec-8008-9711-589aea0dea6e
+// Check if the user is allowed to access YouTube based on the blockUntil time
+function checkYouTubeAccess() {
+  chrome.storage.sync.get(["blockUntil"], function (data) {
+    const blockUntil = data.blockUntil || 0;
+    const currentTime = new Date().getTime();
 
-// Call the function to monitor URL changes (for single-page app behavior)
-monitorURLChange();
+    // If the current time is before the blockUntil time, block access to YouTube
+    if (currentTime < blockUntil) {
+      chrome.runtime.sendMessage({ action: "blockSite" });
+    }
+  });
+}
+
+// Call the check function if the user is anywhere on YouTube
+if (window.location.href.includes("youtube.com")) {
+  checkYouTubeAccess();
+}
