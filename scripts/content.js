@@ -41,180 +41,165 @@ function removeNotificationFromTitle() {
     document.title = document.title.replace(/\s*\(\d+\)/g, "");
   }
 }
-function noGoalStopper() {
-  let isOnSearchPage = false; // Flag to track if we are on the search results page
-  let countWarnElement = 0;
-  // Function to handle the visibility of search results and warnings
-  const checkGoalsAndUpdateUI = () => {
-    // Use setTimeout to delay execution by 250 milliseconds
-    setTimeout(() => {
-      chrome.storage.sync.get("goals", function (data) {
-        const goals = data.goals || [];
 
-        // If no goals are defined
-        if (goals.length === 0) {
+function noGoalStopper() {
+  console.log("I'm running!")
+  const observer = new MutationObserver(() => {
+    const primaryElement = document.getElementById("primary");
+
+    if (primaryElement) {
+      // Stop observing after the primary element is found
+      observer.disconnect();
+
+      // Function to check goals and update UI
+      const updateUI = () => {
+        chrome.storage.sync.get("goals", function (data) {
+          const goals = data.goals || [];
           const mainElement = document.querySelector(
             ".style-scope.ytd-page-manager[role='main']"
           );
 
-          // Hide search results and show warning if no goals are present
-          const searchResults = document.querySelector("#primary");
-          if (searchResults) {
-            searchResults.style.display = "none";
-          }
+          if (goals.length === 0) {
+            // Hide search results and show warning if no goals are present
+            primaryElement.style.display = "none";
 
-          const container = document.querySelector(".style-scope.ytd-search");
-          if (container) {
-            container.style.display = "none";
-          }
+            const container = document.querySelector(".style-scope.ytd-search");
+            if (container) {
+              container.style.display = "none";
+            }
 
-          const header = document.querySelector(
-            ".style-scope.ytd-page-manager[role='main']"
-          );
-          if (header) {
-            header.style.height = "50vh";
-          }
+            if (mainElement) {
+              mainElement.style.height = "50vh"; // Adjust main element height
 
-          const filterButton = document.querySelector(
-            '.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text[aria-label="Suchfilter"]'
-          );
-          if (filterButton) {
-            filterButton.style.display = "none";
-          }
+              const filterButton = document.querySelector(
+                '.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text[aria-label="Suchfilter"]'
+              );
+              if (filterButton) {
+                filterButton.style.display = "none";
+              }
 
-          const warningDiv = document.createElement("div");
-          warningDiv.className = "goal-warning";
-          warningDiv.style.cssText = `
-            text-align: center;
-            margin-top: auto;
-            margin-bottom: auto;
-          `;
+              const warningDiv = document.createElement("div");
+              warningDiv.className = "goal-warning";
+              warningDiv.style.cssText = `
+                text-align: center;
+                margin-top: auto;
+                margin-bottom: auto;
+              `;
 
-          const h1Element = document.createElement("h1");
-          h1Element.textContent = "Please define your goals first.";
-          h1Element.style.cssText = `
-            color: white;
-            font-size: 30px;
-          `;
+              const h1Element = document.createElement("h1");
+              h1Element.textContent = "Please define your goals first.";
+              h1Element.className = "goal-warning"; // Add class for easy removal
+              h1Element.style.cssText = `
+                color: white;
+                font-size: 30px;
+              `;
 
-          const defineGoalsButton = document.createElement("button");
-          defineGoalsButton.textContent = "Define Goals";
-          defineGoalsButton.style.cssText = `
-            background-color: blue;
-            color: white;
-            padding: 18px 32px;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0px 0px 29px 0px rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            margin-top: 20px;
-            transition-duration: 0.5s;
-          `;
+              const defineGoalsButton = document.createElement("button");
+              defineGoalsButton.textContent = "Define Goals";
+              defineGoalsButton.className = "define-goals"; // Add class for easy removal
+              defineGoalsButton.style.cssText = `
+                background-color: blue;
+                color: white;
+                padding: 18px 32px;
+                cursor: pointer;
+                border: none;
+                box-shadow: 0px 0px 29px 0px rgba(255, 255, 255, 0.8);
+                font-size: 15px;
+                margin-top: 20px;
+                transition-duration: 0.5s;
+              `;
 
-          defineGoalsButton.addEventListener("mouseover", function () {
-            defineGoalsButton.style.backgroundColor = "white";
-            defineGoalsButton.style.color = "blue";
-            defineGoalsButton.style.transform = "scale(1.05)";
-          });
+              defineGoalsButton.addEventListener("mouseover", function () {
+                defineGoalsButton.style.backgroundColor = "white";
+                defineGoalsButton.style.color = "blue";
+                defineGoalsButton.style.transform = "scale(1.05)";
+              });
 
-          defineGoalsButton.addEventListener("mouseout", function () {
-            defineGoalsButton.style.backgroundColor = "blue";
-            defineGoalsButton.style.color = "white";
-            defineGoalsButton.style.transform = "scale(1)";
-          });
-          defineGoalsButton.title = "Click here to go to the goals page.";
+              defineGoalsButton.addEventListener("mouseout", function () {
+                defineGoalsButton.style.backgroundColor = "blue";
+                defineGoalsButton.style.color = "white";
+                defineGoalsButton.style.transform = "scale(1)";
+              });
+              defineGoalsButton.title = "Click here to go to the goals page.";
 
-          defineGoalsButton.addEventListener("click", function () {
-            chrome.runtime.sendMessage({ action: "openGoalsPage" });
-          });
+              defineGoalsButton.addEventListener("click", function () {
+                chrome.runtime.sendMessage({ action: "openGoalsPage" });
+              });
 
-          warningDiv.appendChild(h1Element);
-          warningDiv.appendChild(defineGoalsButton);
+              warningDiv.appendChild(h1Element);
+              warningDiv.appendChild(defineGoalsButton);
 
-          if (!document.querySelector(".goal-warning")) {
-            mainElement.insertBefore(warningDiv, mainElement.firstChild);
-            // Hide the Discover section
+              if (!document.querySelector(".goal-warning")) {
+                mainElement.insertBefore(warningDiv, mainElement.firstChild);
+                const discover = document.querySelector(
+                  ".style-scope.ytd-guide-renderer:nth-child(4)"
+                );
+                if (discover) {
+                  discover.style.display = "none";
+                }
+              }
+            }
+          } else {
+            // If goals exist, ensure elements are visible
+            primaryElement.style.display = "block";
+
+            const filterButton = document.querySelector(
+              '.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text[aria-label="Suchfilter"]'
+            );
+            if (filterButton) {
+              filterButton.style.display = "inline-block";
+            }
+
+            const existingH1 = document.querySelector("h1.goal-warning");
+            const existingButton = document.querySelector(
+              "button.define-goals"
+            );
+            if (existingH1) existingH1.remove();
+            if (existingButton) existingButton.remove();
+
             const discover = document.querySelector(
               ".style-scope.ytd-guide-renderer:nth-child(4)"
             );
             if (discover) {
-              discover.style.display = "none";
+              discover.style.display = "block";
             }
           }
-          const ytdSearchElement = document.querySelector(
-            '.ytd-search.style-scope.ytd-page-manager[role="main"]'
-          );
+        });
+      };
 
-          if (ytdSearchElement) {
-            console.log("search element found!");
-            const goalWarningElement =
-              ytdSearchElement.querySelector(".goal-warning");
+      // Initial UI update
+      updateUI();
 
-            if (!goalWarningElement) {
-              console.log(
-                'Element with class "goal-warning" not found inside ytd-search element.'
-              );
-            } else {
-              console.log("goal-warning found");
-            }
-          } else {
-            console.log("ytd-search element not found.");
-          }
-        } else {
-          // If goals are defined, show search results
-          const searchResults = document.querySelector("#primary");
-          if (searchResults) {
-            searchResults.style.display = "block";
-          }
-
-          const filterButton = document.querySelector(
-            '.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text[aria-label="Suchfilter"]'
-          );
-          if (filterButton) {
-            filterButton.style.display = "inline-block";
-          }
-
-          const existingH1 = document.querySelector("h1.goal-warning");
-          const existingButton = document.querySelector("button.define-goals");
-          if (existingH1) existingH1.remove();
-          if (existingButton) existingButton.remove();
-
-          const discover = document.querySelector(
-            ".style-scope.ytd-guide-renderer:nth-child(4)"
-          );
-          if (discover) {
-            discover.style.display = "block";
-          }
+      // Listen for changes in storage
+      chrome.storage.onChanged.addListener(function (changes, namespace) {
+        if (namespace === "sync" && changes.goals) {
+          updateUI();
         }
       });
-    }, 800);
-  };
+    }
+  });
 
-  // Initial check for the URL
-  if (window.location.href.startsWith("https://www.youtube.com/")) {
-    isOnSearchPage = false;
-
-    // Set up a MutationObserver to listen for URL changes
-    const observer = new MutationObserver(() => {
-      // Check for search query URL
-      if (
-        window.location.href.startsWith(
-          "https://www.youtube.com/results?search_query="
-        )
-      ) {
-        isOnSearchPage = true; // Update the flag when on the search results page
-        checkGoalsAndUpdateUI(); // Check goals and update UI
-      } else {
-        isOnSearchPage = false; // Update the flag when leaving the search results page
-      }
-    });
-
-    // Start observing the body for changes
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
+  // Start observing the document for changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 }
 
-noGoalStopper();
+function searchObserve() {
+  const urlObserver = new MutationObserver(() => {
+    if (window.location.href.startsWith("https://www.youtube.com/results?")) {
+      console.log("Searching without goal!")
+      noGoalStopper();
+    }
+  });
+
+  urlObserver.observe(document, {
+    subtree: true,
+    childList: true,
+  });
+}
+searchObserve();
 
 // Initialisierung des MutationObservers für den Titel
 function observeTitle() {

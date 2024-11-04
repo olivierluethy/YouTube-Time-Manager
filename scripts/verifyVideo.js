@@ -67,27 +67,35 @@ function compareVideoWithGoals() {
               }
 
               // Normalize the title and description for comparison (case insensitive)
-              const normalizedTitle = title.toLowerCase();
-              const normalizedDescription = description.toLowerCase();
+              const normalizedTitle = title
+                .toLowerCase()
+                .replace(/[.,!?]/g, ""); // Remove punctuation
+              const normalizedDescription = description
+                .toLowerCase()
+                .replace(/[.,!?]/g, ""); // Remove punctuation
 
-              // Split the title and description into individual words (this helps with exact word matching)
-              const titleWords = normalizedTitle.split(/\s+/);
-              const descriptionWords = normalizedDescription.split(/\s+/);
+              console.log("The normalized video title: " + normalizedTitle);
+              console.log(
+                "Normalized video description: " + normalizedDescription
+              );
 
-              console.log("The video title: " + titleWords);
-              console.log("Video description: " + descriptionWords);
-
-              // Check if any goal word matches a word in the title or description
+              // Check if any goal matches the title or description
               const goalMatches = goals.some((goal) => {
-                const normalizedGoal = goal.toLowerCase();
+                const words = goal
+                  .toLowerCase()
+                  .replace(/[.,!?]/g, "") // Entfernt Satzzeichen
+                  .split(" "); // Teilt das Ziel in einzelne Wörter auf
 
-                console.log("The Goals: " + goal);
+                console.log("Checking individual words for goal:", words);
 
-                // Check if the goal matches a word in the title or description
-                return (
-                  titleWords.includes(normalizedGoal) ||
-                  descriptionWords.includes(normalizedGoal)
-                );
+                // Überprüfe, ob mindestens ein Wort im Titel oder der Beschreibung vorkommt
+                return words.some((word) => {
+                  console.log("Checking word:", word);
+                  return (
+                    normalizedTitle.includes(word) ||
+                    normalizedDescription.includes(word)
+                  );
+                });
               });
 
               if (goalMatches) {

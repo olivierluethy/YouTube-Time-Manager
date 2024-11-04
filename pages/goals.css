@@ -66,8 +66,8 @@ span.remove-goal {
   font-size: 2em; /* Slightly smaller quotes */
   color: #007acc;
   position: absolute;
-  left: -8px;
-  top: -5px;
+  left: -1px;
+  top: -3px;
 }
 
 .quote::after {
@@ -75,6 +75,6 @@ span.remove-goal {
   font-size: 2em;
   color: #007acc;
   position: absolute;
-  right: -8px;
-  bottom: -5px;
+  right: 3px;
+  top: -3px;
 }
