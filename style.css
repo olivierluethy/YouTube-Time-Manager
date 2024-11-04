@@ -28,7 +28,7 @@ span {
   color: white;
 }
 
-button {
+#redirectButton {
   background-color: #0b468a;
   border: none;
   color: white;
@@ -41,9 +41,28 @@ button {
   transition-duration: 0.4s;
   cursor: pointer;
 }
-button:hover {
+#redirectButton:hover {
   background-color: white;
   color: #0b468a;
+}
+
+#goToFAQ {
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+  padding: 8px 28px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+#goToFAQ:hover{
+  background-color: white;
+  color: black;
 }
 
 .switch {

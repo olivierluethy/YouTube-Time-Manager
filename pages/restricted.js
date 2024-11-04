@@ -47,5 +47,90 @@ function updateRemainingTime() {
   intervalId = setInterval(updateTimer, 1000);
 }
 
+chrome.storage.sync.get(["dailyWasteTimeCounter"], (result) => {
+  // Clear existing rows in the table body
+  const tbody = document.querySelector("tbody");
+  tbody.innerHTML = ""; // Clear previous entries
+
+  // Check if dailyWasteTimeCounter exists
+  if (result.dailyWasteTimeCounter) {
+    const dailyWasteTimeCounter = result.dailyWasteTimeCounter;
+
+    // Function to format the date
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const options = { day: "numeric", month: "long", year: "numeric" };
+      return date.toLocaleDateString("de-DE", options); // Format in German
+    };
+
+    // Iterate over each date in the dailyWasteTimeCounter
+    for (const [date, count] of Object.entries(dailyWasteTimeCounter)) {
+      const formattedDate = formatDate(date);
+
+      // Create a new row for each date
+      const row = document.createElement("tr");
+      const dateCell = document.createElement("td");
+      const countCell = document.createElement("td");
+
+      dateCell.style.padding = "10px";
+      countCell.style.padding = "10px";
+
+      dateCell.innerText =
+        formattedDate !== "Invalid Date" ? formattedDate : "Not available";
+      countCell.innerText = count;
+
+      row.appendChild(dateCell);
+      row.appendChild(countCell);
+      tbody.appendChild(row);
+    }
+  } else {
+    // If dailyWasteTimeCounter is not found, show a default message
+    const row = document.createElement("tr");
+    const dateCell = document.createElement("td");
+    const countCell = document.createElement("td");
+
+    dateCell.style.padding = "10px";
+    countCell.style.padding = "10px";
+
+    dateCell.innerText = "Not available";
+    countCell.innerText = "0";
+
+    row.appendChild(dateCell);
+    row.appendChild(countCell);
+    tbody.appendChild(row);
+  }
+});
+
 // Call the function to start the timer
 updateRemainingTime();
+
+// Function to calculate the prediction
+function calculatePrediction(dailyAverageHours) {
+  const daysInWeek = 7;
+  const daysInMonth = 30; // Approximation
+  const daysInYear = 365;
+
+  // Calculate total time wasted
+  const weeklyWaste = dailyAverageHours * daysInWeek; // Total hours wasted in a week
+  const monthlyWaste = dailyAverageHours * daysInMonth; // Total hours wasted in a month
+  const yearlyWaste = dailyAverageHours * daysInYear; // Total hours wasted in a year
+
+  // Convert hours to a more readable format (hours and minutes)
+  const formatTime = (totalHours) => {
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours - hours) * 60);
+    return `${hours} hours and ${minutes} minutes`;
+  };
+
+  // Display the predictions
+  const predictionDiv = document.getElementById("prediction");
+  predictionDiv.innerHTML = `
+      <p>Weekly: ${formatTime(weeklyWaste)}</p>
+      <p>Monthly: ${formatTime(monthlyWaste)}</p>
+      <p>Yearly: ${formatTime(yearlyWaste)}</p>
+  `;
+}
+
+// Assuming an average of 2 hours per day watching YouTube
+const dailyAverageHours = 2;
+calculatePrediction(dailyAverageHours);

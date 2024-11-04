@@ -127,12 +127,12 @@ function noGoalStopper() {
           defineGoalsButton.addEventListener("click", function () {
             chrome.runtime.sendMessage({ action: "openGoalsPage" });
           });
-          // Create warning and button if they do not exist
-          if (countWarnElement == 0) {
-            warningDiv.appendChild(h1Element);
-            warningDiv.appendChild(defineGoalsButton);
-            mainElement.insertBefore(warningDiv, mainElement.firstChild);
 
+          warningDiv.appendChild(h1Element);
+          warningDiv.appendChild(defineGoalsButton);
+
+          if (!document.querySelector(".goal-warning")) {
+            mainElement.insertBefore(warningDiv, mainElement.firstChild);
             // Hide the Discover section
             const discover = document.querySelector(
               ".style-scope.ytd-guide-renderer:nth-child(4)"
@@ -140,7 +140,25 @@ function noGoalStopper() {
             if (discover) {
               discover.style.display = "none";
             }
-            countWarnElement++;
+          }
+          const ytdSearchElement = document.querySelector(
+            '.ytd-search.style-scope.ytd-page-manager[role="main"]'
+          );
+
+          if (ytdSearchElement) {
+            console.log("search element found!");
+            const goalWarningElement =
+              ytdSearchElement.querySelector(".goal-warning");
+
+            if (!goalWarningElement) {
+              console.log(
+                'Element with class "goal-warning" not found inside ytd-search element.'
+              );
+            } else {
+              console.log("goal-warning found");
+            }
+          } else {
+            console.log("ytd-search element not found.");
           }
         } else {
           // If goals are defined, show search results
@@ -169,7 +187,7 @@ function noGoalStopper() {
           }
         }
       });
-    }, 600);
+    }, 800);
   };
 
   // Initial check for the URL

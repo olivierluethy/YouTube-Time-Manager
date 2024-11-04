@@ -1,200 +1,265 @@
-/* YouTube API interaction for feed results */
 function searchVideos(goals) {
   if (!goals || goals.length === 0) {
     console.log("No goals provided. Exiting the function.");
     return;
   }
 
-  chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
-    const storedGoals = res.doubleGoals || [];
-    const storedVideos = res.videoData || [];
+  // Create a MutationObserver to watch for changes to the body
+  const observer = new MutationObserver((mutations) => {
+    const primaryElement = document.getElementById("primary");
 
-    // Compare the current goals with stored goals
-    if (JSON.stringify(storedGoals) === JSON.stringify(goals)) {
-      console.log("Goals are the same, displaying cached videos.");
-      console.log("Cached Videos:", storedVideos); // Debugging output
+    if (primaryElement) {
+      // Stop observing after the primary element is found
+      observer.disconnect();
 
-      // Create a MutationObserver to watch for changes to the body
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.addedNodes.length) {
-            const primaryElement = document.getElementById("primary");
-            if (primaryElement) {
-              // Clear existing content
-              primaryElement.innerHTML = "";
+      // Proceed with fetching goals and videos
+      chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
+        const storedGoals = res.doubleGoals || {};
+        const storedVideos = res.videoData || {};
 
-              const videoContainer = document.createElement("div");
-              videoContainer.style.marginTop = "1rem";
-              videoContainer.style.marginLeft = "1rem";
-              videoContainer.style.display = "flex";
-              videoContainer.style.flexWrap = "wrap";
-              videoContainer.style.gap = "16px";
-              videoContainer.style.justifyContent = "flex-start";
+        const goalVideos = { ...storedVideos }; // Initialize goalVideos with stored data
 
-              storedVideos.forEach((video) => {
-                const videoElement = document.createElement("div");
-                videoElement.style.flex = "1 1 300px";
-                videoElement.style.maxWidth = "315px";
-                videoElement.style.borderRadius = "8px";
-                videoElement.style.overflow = "hidden";
-                videoElement.style.boxShadow =
-                  "0px 0px 10px 0px rgba(255, 255, 255, 0.8)";
+        // Convert the goals array into an object for easier comparison
+        const goalsObject = {};
+        goals.forEach((goal) => (goalsObject[goal] = true));
 
-                // Add hover effect styles
-                videoElement.style.transition =
-                  "background-color 0.5s ease-in-out"; // Transition for smoother effect
+        // Check if storedGoals have changed
+        const goalsToAdd = goals.filter((goal) => !storedGoals[goal]);
+        const goalsToRemove = Object.keys(storedGoals).filter(
+          (storedGoal) => !goalsObject[storedGoal]
+        );
 
-                videoElement.innerHTML = `
-                  <a title='${video.description}' style='text-decoration:none;' href="${video.url}" target="_blank">
-                    <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}">
-                    <h3 style="color: white;margin-left:0.5rem;">${video.title}</h3>
-                    <p style="color: white;margin-left:0.5rem;">${video.description}</p>
-                  </a>
-                `;
+        // Check if all goals are already stored
+        if (goalsToAdd.length === 0 && goalsToRemove.length === 0) {
+          console.log(
+            "All goals are already stored. No API call will be made."
+          );
+          displayVideos(goalVideos);
+          return; // Exit if no changes
+        }
 
-                // Add event listeners to the anchor element (a)
-                const anchorElement = videoElement.querySelector("a");
-                anchorElement.style.color = "black"; // Set default text color for the anchor
+        // TODO: What happens if there are no goals? it should display define goals and handle also api errors
+        // Handle added goals by fetching video data
+        if (goalsToAdd.length > 0) {
+          console.log("Goals to add:", goalsToAdd);
 
-                anchorElement.addEventListener("mouseover", () => {
-                  videoElement.style.backgroundColor = "#484848";
+          // Fetch videos for each new goal and add to goalVideos
+          Promise.all(
+            goalsToAdd.map((goal) => {
+              const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
+              const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+                goal
+              )}&type=video&key=${apiKey}`;
+
+              return fetch(url)
+                .then((response) => response.json())
+                .then((data) => {
+                  const shortsRegex = /#?short/i; // Regular expression to match "short", "shorts", "#short", "#shorts" etc.
+
+                  const videos = data.items
+                    .map((item) => ({
+                      videoId: item.id.videoId,
+                      title: item.snippet.title,
+                      url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+                      description: item.snippet.description,
+                      thumbnail: item.snippet.thumbnails.medium.url,
+                    }))
+                    .filter((video) => {
+                      // Check if title or description contains the regex pattern
+                      return (
+                        !shortsRegex.test(video.title) &&
+                        !shortsRegex.test(video.description)
+                      );
+                    });
+
+                  goalVideos[goal] = videos; // Store videos for the goal
+                  storedGoals[goal] = true; // Mark goal as stored
                 });
-                anchorElement.addEventListener("mouseout", () => {
-                  videoElement.style.backgroundColor = "black";
-                });
+            })
+          )
+            .then(() => {
+              // Save updated videos and goals to storage
+              chrome.storage.sync.set(
+                { doubleGoals: storedGoals, videoData: goalVideos },
+                () => {
+                  console.log(
+                    "Updated stored goals and videos:",
+                    storedGoals,
+                    goalVideos
+                  );
+                  displayVideos(goalVideos);
+                }
+              );
+            })
+            .catch((error) => {
+              console.error("Error fetching videos:", error);
+            });
+        }
 
-                videoContainer.appendChild(videoElement);
-              });
+        // Handle removed goals by deleting from goal Videos
+        if (goalsToRemove.length > 0) {
+          console.log("Goals to remove:", goalsToRemove);
+          goalsToRemove.forEach((goal) => {
+            delete goalVideos[goal];
+            delete storedGoals[goal]; // Also remove from storedGoals
+          });
 
-              primaryElement.appendChild(videoContainer);
-
-              // Stop observing after the primary element is found and updated
-              observer.disconnect();
-            }
-          }
-        });
-      });
-
-      // Start observing the body for changes
-      observer.observe(document.body, { childList: true, subtree: true });
-    } else {
-      const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
-      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-        goals.join(" ")
-      )}&type=video&key=${apiKey}`;
-
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.error) {
-            console.error("API Error:", data.error);
-            handleAPIErrors(data.error);
-            return;
-          }
-
-          const videos = data.items
-            ? data.items.filter((video) => {
-                const titleLower = video.snippet.title.toLowerCase();
-                const descriptionLower =
-                  video.snippet.description?.toLowerCase(); // Optional chaining for description
-                return !(
-                  titleLower.includes("shorts") ||
-                  (descriptionLower && descriptionLower.includes("shorts"))
-                );
-              })
-            : [];
-
-          console.log("Video Recommendations:", videos);
-
-          if (videos.length === 0) {
-            document.getElementById("primary").innerHTML =
-              "<p>No video recommendations found.</p>";
-            return;
-          }
-
-          const videoData = videos.map((video) => ({
-            title: video.snippet.title,
-            url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
-            description: video.snippet.description,
-            thumbnail: video.snippet.thumbnails.default.url,
-          }));
-
-          // Store the new goals and videos in Chrome Storage
+          // Update the storage with the new goals
           chrome.storage.sync.set(
-            { doubleGoals: goals, videoData: videoData },
+            { doubleGoals: storedGoals, videoData: goalVideos },
             () => {
-              console.log("Goals and video data stored:", goals, videoData);
+              console.log("Updated stored goals after removal:", storedGoals);
+              displayVideos(goalVideos);
             }
           );
-
-          displayVideos(videoData);
-        })
-        .catch((error) => {
-          console.error("Error fetching video recommendations:", error);
-          // Redirect or handle error
-        });
+        } else {
+          // If no goals are removed, just display the videos
+          displayVideos(goalVideos);
+        }
+      });
     }
   });
+
+  // Start observing the entire document for added nodes
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
-function displayVideos(videoData) {
-  console.log("The Videos are here! " + videoData);
-
+// Function to display videos grouped by goal
+function displayVideos(goalVideos) {
   const primaryElement = document.getElementById("primary");
   primaryElement.innerHTML = ""; // Clear existing content
 
-  if (videoData.length === 0) {
-    primaryElement.innerHTML = "<p>No video recommendations found.</p>";
-    return; // Early exit if no videos
+  // Add button container at the top
+  const buttonContainer = document.createElement("div");
+  buttonContainer.className = "goal-buttons";
+  buttonContainer.style.display = "flex";
+  buttonContainer.style.gap = "8px";
+  buttonContainer.style.marginBottom = "1rem";
+  buttonContainer.style.padding = "1rem";
+  buttonContainer.style.position = "fixed";
+  buttonContainer.style.width = "100%";
+  buttonContainer.style.top = "50"; // This keeps it at the top of the viewport
+  buttonContainer.style.backgroundColor = "#0f0f0f"; // Optional: Set a background color
+  buttonContainer.style.zIndex = "1000"; // Optional: Ensure it stays on top of other elements
+
+  // Create buttons for each goal
+  for (const goalName of Object.keys(goalVideos)) {
+    const goalButton = document.createElement("button");
+    goalButton.textContent = goalName;
+    goalButton.title = "Click to move to the section of " + goalName;
+    goalButton.style.padding = "0.8rem 1.2rem";
+    goalButton.style.borderRadius = "6px";
+    goalButton.style.cursor = "pointer";
+    goalButton.style.backgroundColor = "rgba(255,255,255,0.2";
+    goalButton.style.color = "white";
+    goalButton.style.border = "none";
+    goalButton.style.transition = "background-color 0.3s";
+
+    goalButton.addEventListener("click", () => {
+      document
+        .getElementById(`goal-${goalName}`)
+        .scrollIntoView({ behavior: "smooth" });
+    });
+
+    goalButton.addEventListener("mouseover", () => {
+      goalButton.style.backgroundColor = "#555";
+    });
+    goalButton.addEventListener("mouseout", () => {
+      goalButton.style.backgroundColor = "#333";
+    });
+
+    // Add click event to scroll to the goal section
+    goalButton.addEventListener("click", () => {
+      const goalElement = document.getElementById(`goal-${goalName}`);
+      const offset = 110; // Adjust this value as needed
+
+      // Calculate the target scroll position
+      const elementPosition =
+        goalElement.getBoundingClientRect().top + window.scrollY;
+      const targetPosition = elementPosition - offset;
+
+      // Scroll to the target position smoothly
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
+    });
+
+    buttonContainer.appendChild(goalButton);
   }
 
-  const videoContainer = document.createElement("div");
-  videoContainer.style.marginTop = "1rem";
-  videoContainer.style.marginLeft = "1rem";
-  videoContainer.style.display = "flex";
-  videoContainer.style.flexWrap = "wrap";
-  videoContainer.style.gap = "16px";
-  videoContainer.style.justifyContent = "flex-start";
+  primaryElement.appendChild(buttonContainer);
 
-  storedVideos.forEach((video) => {
-    const videoElement = document.createElement("div");
-    videoElement.style.flex = "1 1 300px";
-    videoElement.style.maxWidth = "315px";
-    videoElement.style.borderRadius = "8px";
-    videoElement.style.overflow = "hidden";
-    videoElement.style.boxShadow = "0px 0px 10px 0px rgba(255, 255, 255, 0.8)";
+  // Display the videos grouped by goal
+  if (Object.keys(goalVideos).length === 0) {
+    primaryElement.innerHTML += "<p>No video recommendations found.</p>";
+    return;
+  }
 
-    // Add hover effect styles
-    videoElement.style.transition = "background-color 0.5s ease-in-out"; // Transition for smoother effect
+  let isFirstGoal = true;
+  for (const [goalName, videos] of Object.entries(goalVideos)) {
+    // Create a section for each goal
+    const goalSection = document.createElement("div");
+    goalSection.id = `goal-${goalName}`;
+    goalSection.style.marginBottom = "2rem";
 
-    videoElement.innerHTML = `
-            <a title='${video.description}' style='text-decoration:none;' href="${video.url}" target="_blank">
-              <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}">
-              <h3 style="color: white;margin-left:0.5rem;">${video.title}</h3>
-              <p style="color: white;margin-left:0.5rem;">${video.description}</p>
-            </a>
-          `;
+    // Add goal name as a title
+    const goalTitle = document.createElement("h2");
+    goalTitle.textContent = goalName;
+    goalTitle.style.color = "white";
 
-    // Add event listeners to the anchor element (a)
-    const anchorElement = videoElement.querySelector("a");
+    // Apply margin-top of 6rem only for the first goal
+    if (isFirstGoal) {
+      goalTitle.style.marginTop = "6rem";
+      isFirstGoal = false; // Set to false after the first goal
+    } else {
+      goalTitle.style.marginTop = "2rem";
+    }
+    goalTitle.style.marginLeft = "1rem";
+    goalTitle.style.marginBottom = "1rem";
+    goalSection.appendChild(goalTitle);
 
-    anchorElement.style.color = "black"; // Set default text color for the anchor
+    // Container for videos under the goal
+    const videoContainer = document.createElement("div");
+    videoContainer.style.display = "flex";
+    videoContainer.style.flexWrap = "wrap";
+    videoContainer.style.gap = "16px";
+    videoContainer.style.justifyContent = "flex-start";
+    videoContainer.style.marginLeft = "1rem";
 
-    anchorElement.addEventListener("mouseover", () => {
-      videoElement.style.backgroundColor = "#484848";
-    });
-    anchorElement.addEventListener("mouseout", () => {
+    videos.forEach((video) => {
+      // Individual video card
+      const videoElement = document.createElement("div");
+      videoElement.style.flex = "1 1 300px";
+      videoElement.style.maxWidth = "315px";
+      videoElement.style.borderRadius = "8px";
+      videoElement.style.overflow = "hidden";
       videoElement.style.backgroundColor = "black";
+      videoElement.style.boxShadow =
+        "0px 0px 10px 0px rgba(255, 255, 255, 0.8)";
+      videoElement.style.transition = "background-color 0.5s ease-in-out";
+
+      videoElement.innerHTML = `
+        <a title='${video.description}' style='text-decoration:none;' href="${video.url}" target="_blank">
+          <img width="100%" height="180" src="${video.thumbnail}" alt="${video.title}" style="display: block; border-radius: 8px 8px 0 0;">
+          <h3 style="color: white; margin: 0.5rem 0.5rem 0 0.5rem;">${video.title}</h3>
+          <p style="color: white; margin: 0.5rem;">${video.description}</p>
+        </a>
+      `;
+
+      const anchorElement = videoElement.querySelector("a");
+      anchorElement.style.color = "white";
+      anchorElement.addEventListener("mouseover", () => {
+        videoElement.style.backgroundColor = "#484848";
+      });
+      anchorElement.addEventListener("mouseout", () => {
+        videoElement.style.backgroundColor = "black";
+      });
+
+      videoContainer.appendChild(videoElement);
     });
 
-    videoContainer.appendChild(videoElement);
-  });
-
-  primaryElement.appendChild(videoContainer);
-}
-
-function handleAPIErrors(error) {
-  if (error.code === 403 || error.status === "PERMISSION_DENIED") {
-    // Handle permissions and redirect logic
+    goalSection.appendChild(videoContainer);
+    primaryElement.appendChild(goalSection);
   }
 }
