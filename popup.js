@@ -15,6 +15,10 @@ document
     chrome.tabs.create({ url: chrome.runtime.getURL("/pages/goals.html") });
   });
 
+document.getElementById("goToFAQ").addEventListener("click", function(){
+  chrome.tabs.create({ url: chrome.runtime.getURL("/pages/FAQ.html") });
+})
+
 document.addEventListener("DOMContentLoaded", () => {
   const checkboxSubs = document.getElementById("checkbox-subs");
 

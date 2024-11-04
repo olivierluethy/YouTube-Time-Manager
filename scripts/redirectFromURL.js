@@ -33,7 +33,7 @@ function redirectToSubscriptions() {
 
           if (hideFeed === false) {
             // Redirect to the playlist section if hideFeed is false
-            window.location.href = "https://www.youtube.com/playlist?list=WL";
+            window.location.href = "https://www.youtube.com/feed/playlists";
           } else {
             // Redirect to the subscriptions page if hideFeed is true
             window.location.href = "https://www.youtube.com/feed/subscriptions";
@@ -48,7 +48,7 @@ let isOnPlaylistPage = false; // Flag to check if we are on the playlist page
 function checkIfLogin() {
   // Initial check for the URL
   if (
-    window.location.href.startsWith("https://www.youtube.com/playlist?list=WL")
+    window.location.href.startsWith("https://www.youtube.com/feed/playlists")
   ) {
     console.log("Loginüberprüfung aktiviert!");
     isOnPlaylistPage = true; // Set flag to true
@@ -137,7 +137,7 @@ function checkIfLogin() {
     const observer = new MutationObserver(() => {
       if (
         !window.location.href.startsWith(
-          "https://www.youtube.com/playlist?list=WL"
+          "https://www.youtube.com/feed/playlists"
         )
       ) {
         isOnPlaylistPage = false; // Update the flag when leaving the playlist page
@@ -173,7 +173,7 @@ function addLogoClickListener() {
               document.querySelector(
                 '.yt-simple-endpoint[title="Abos"]'
               ).style.display = "none";
-              window.location.href = "https://www.youtube.com/playlist?list=WL";
+              window.location.href = "https://www.youtube.com/feed/playlists";
             }
           });
         } else {
