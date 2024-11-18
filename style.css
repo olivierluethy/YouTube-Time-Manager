@@ -24,6 +24,11 @@ h1 {
   text-align: center;
 }
 
+img {
+  display: block;
+  margin: 0 auto;
+}
+
 span {
   color: white;
 }
@@ -61,7 +66,7 @@ span {
   cursor: pointer;
 }
 
-#goToFAQ:hover{
+#goToFAQ:hover {
   background-color: white;
   color: black;
 }

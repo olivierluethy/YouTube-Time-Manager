@@ -12,6 +12,7 @@ body {
     width: 50%;
     margin-left: auto;
     margin-right: auto;
+    box-shadow: white 0px 0px 29px 0px;
   }
   .accordion {
     background-color: #eee;
@@ -22,8 +23,9 @@ body {
     border: none;
     text-align: left;
     outline: none;
-    font-size: 15px;
+    font-size: 20px;
     transition: 0.4s;
+    font-weight: bold;
 }
 
 .active, .accordion:hover {
@@ -49,4 +51,5 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
+    font-size: 15px;
 }

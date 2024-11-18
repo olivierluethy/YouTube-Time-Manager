@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Disblock",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Hides YouTube video recommendations, keeping playlist videos visible to reduce distractions.",
   "action": {
     "default_popup": "popup.html",
@@ -28,8 +28,6 @@
     }
   ],
   "permissions": [
-    "tabs",
-    "activeTab",
     "storage"
   ],
   "web_accessible_resources": [{
