@@ -43,6 +43,17 @@ function redirectToSubscriptions() {
     });
   }
 }
+// If a friend sends a shorts video to me and I click, I won't be able to see it and get redirected to youtube.com
+function clickToShortsBlocker() {
+  // Check if the current URL contains "/shorts/"
+  if (window.location.href.includes("/shorts/")) {
+    // Redirect to the main YouTube page
+    window.location.href = "https://www.youtube.com";
+  }
+}
+
+window.onload = clickToShortsBlocker;
+
 let isOnPlaylistPage = false; // Flag to check if we are on the playlist page
 
 function checkIfLogin() {

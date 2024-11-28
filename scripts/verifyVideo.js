@@ -31,7 +31,6 @@ function compareVideoWithGoals() {
                   console.log(
                     "Block time expired. wasteTimeCounter reset to 0."
                   );
-
                   // Continue logic after resetting the counter to 0
                   handleVideoGoals();
                 }
@@ -201,33 +200,49 @@ function compareVideoWithGoals() {
         );
       }
     } else {
-      console.log("Title does not exist yet.");
+      console.log("Title or description does not exist yet.");
     }
   }
 
   // Set up the MutationObserver to watch for DOM changes
   const observer = new MutationObserver(() => {
-    // Check if the title has loaded on the page
-    const titleElement = document.querySelector(
-      "yt-formatted-string.style-scope.ytd-watch-metadata"
-    );
-    if (titleElement && !messagesDisplayed) {
-      checkTitleAndGoals();
-      observer.disconnect(); // Stop observing once the title is found and checked
-    }
+    console.log("Mutation detected, checking title...");
+    checkTitleAndGoals();
   });
 
-  // Start observing changes to the entire document body
-  observer.observe(document.body, {
-    childList: true, // Monitor direct children of the body for changes
-    subtree: true, // Watch all levels in the DOM tree
-  });
+  // Start observing changes to the title element specifically
+  const titleElement = document.querySelector(
+    "yt-formatted-string.style-scope.ytd-watch-metadata"
+  );
+
+  if (titleElement) {
+    observer.observe(titleElement, {
+      childList: true, // Monitor direct children for changes
+      subtree: true, // Watch all levels in the DOM tree
+    });
+  }
+
+  // Fallback: Check title every second if the observer doesn't catch it
+  const intervalId = setInterval(() => {
+    if (
+      document.querySelector(
+        "yt-formatted-string.style-scope.ytd-watch-metadata"
+      )
+    ) {
+      checkTitleAndGoals();
+    }
+  }, 1000);
+
+  // Clear the interval when the observer is triggered
+  observer.disconnect();
+  clearInterval(intervalId);
 }
+
+// Call the function to start the observer if on a video page
 if (window.location.href.includes("youtube.com/watch?v=")) {
-  // Call the function to start the observer
   compareVideoWithGoals();
 }
-// https://chatgpt.com/share/67288f3f-2aec-8008-9711-589aea0dea6e
+
 // Check if the user is allowed to access YouTube based on the blockUntil time
 function checkYouTubeAccess() {
   chrome.storage.sync.get(["blockUntil"], function (data) {
