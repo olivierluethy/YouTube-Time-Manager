@@ -37,7 +37,7 @@ function updateRemainingTime() {
         if (banMessageElement) {
           banMessageElement.textContent = "";
         }
-        window.location.href = "https://www.youtube.com/";
+        // window.location.href = "https://www.youtube.com/";
       }
     });
   };
@@ -63,8 +63,13 @@ chrome.storage.sync.get(["dailyWasteTimeCounter"], (result) => {
       return date.toLocaleDateString("de-DE", options); // Format in German
     };
 
-    // Iterate over each date in the dailyWasteTimeCounter
-    for (const [date, count] of Object.entries(dailyWasteTimeCounter)) {
+    // Convert the object into an array of entries and sort by date (newest first)
+    const sortedEntries = Object.entries(dailyWasteTimeCounter).sort((a, b) => {
+      return new Date(b[0]) - new Date(a[0]); // Sort descending by date
+    });
+
+    // Iterate over each sorted entry
+    for (const [date, count] of sortedEntries) {
       const formattedDate = formatDate(date);
 
       // Create a new row for each date
