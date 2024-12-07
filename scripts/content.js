@@ -45,11 +45,7 @@ function removeNotificationFromTitle() {
 let intervalId = null; // Global speichern
 
 function noGoalStopper() {
-  if (
-    window.location.href.startsWith(
-      "https://www.youtube.com/results?search_query="
-    )
-  ) {
+  if (window.location.href.startsWith("https://www.youtube.com/results?")) {
     // Verhindert mehrere Intervalle
     if (intervalId) clearInterval(intervalId);
 
@@ -108,6 +104,7 @@ function noGoalStopper() {
 
             const defineGoalsButton = document.createElement("button");
             defineGoalsButton.textContent = "Define Goals";
+            defineGoalsButton.title = "Click here to define your goals";
             defineGoalsButton.style.cssText = `
               background-color: blue;
               color: white;

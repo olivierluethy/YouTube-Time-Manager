@@ -41,8 +41,17 @@ function redirectToSubscriptions() {
         });
       }
     });
+    // Redirect to the playlist section if hideFeed is false
+    window.location.href = "https://www.youtube.com/feed/playlists";
   }
 }
+checkIfHome = setInterval(() => {
+  if (window.location.href.includes("www.youtube.com/")) {
+    console.log("Inside of home page")
+    redirectToSubscriptions();
+  }
+}, 1000);
+
 // If a friend sends a shorts video to me and I click, I won't be able to see it and get redirected to youtube.com
 function clickToShortsBlocker() {
   // Check if the current URL contains "/shorts/"
