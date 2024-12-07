@@ -4,7 +4,10 @@ const BLOCK_DURATION_MINUTES = 10;
 let messagesDisplayed = false;
 
 function compareVideoWithGoals() {
-  if (isVideoChecked == true) {
+  // Reset variables at the start of the function
+  isVideoChecked = false;
+  messagesDisplayed = false;
+  if (isVideoChecked) {
     console.log("Nothing happens");
   } else {
     console.log("compareVideoWithGoals started");
@@ -19,9 +22,12 @@ function compareVideoWithGoals() {
     }, 1000);
 
     function checkTitleAndGoals() {
+      /* Title of video */
       const titleElement = document.querySelector(
-        "span.style-scope.yt-formatted-string"
+        "yt-formatted-string.style-scope.ytd-watch-metadata"
       );
+
+      /* Description of video */
       const descriptionElement = document.querySelector(
         ".yt-core-attributed-string--link-inherit-color"
       );
@@ -66,6 +72,8 @@ function compareVideoWithGoals() {
                   .toLowerCase()
                   .replace(/[.,!?]/g, "");
 
+                alert("Titel: " + normalizedTitle);
+                alert("Beschreibung: " + normalizedDescription);
                 // Check if any goal matches the title or description
                 const goalMatches = goals.some((goal) => {
                   const words = goal
@@ -185,7 +193,7 @@ function compareVideoWithGoals() {
   const observer = new MutationObserver(() => {
     // Check if the title has loaded on the page
     const titleElement = document.querySelector(
-      "span.style-scope.yt-formatted-string"
+      "yt-formatted-string.style-scope.ytd-watch-metadata"
     );
     if (titleElement && !messagesDisplayed) {
       checkTitleAndGoals();
@@ -201,6 +209,7 @@ function compareVideoWithGoals() {
 }
 
 // Set an interval to check for various conditions every second
+// https://github.com/olivierluethy/YouTube-Disblock/blob/afd219c81725a1dc5a483b8593ce194ed6b3cd18/scripts/verifyVideo.js
 const checkStart = setInterval(() => {
   const pathname = window.location.pathname;
   const searchParams = new URLSearchParams(window.location.search);
@@ -233,7 +242,7 @@ const checkStart = setInterval(() => {
       });
     }
   }
-}, 1000); // Check every 1 second
+}, 1500); // Check every 1 second
 
 // Check if the user is allowed to access YouTube based on the blockUntil time
 function checkYouTubeAccess() {
