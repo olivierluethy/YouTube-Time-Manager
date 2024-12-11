@@ -41,8 +41,6 @@ function redirectToSubscriptions() {
         });
       }
     });
-    // Redirect to the playlist section if hideFeed is false
-    window.location.href = "https://www.youtube.com/feed/playlists";
   }
 }
 checkIfHome = setInterval(() => {
@@ -193,7 +191,7 @@ function addLogoClickListener() {
               document.querySelector(
                 '.yt-simple-endpoint[title="Abos"]'
               ).style.display = "none";
-              window.location.href = "https://www.youtube.com/feed/playlists";
+              // window.location.href = "https://www.youtube.com/feed/playlists";
             }
           });
         } else {

@@ -5,4 +5,4 @@ const yearElement = document.getElementById("nameYear");
 const currentYear = new Date().getFullYear();
 
 // Setze den Textinhalt des Elements auf das aktuelle Jahr
-yearElement.textContent = `© ${currentYear}. by Olivier Lüthy`;
+yearElement.textContent = `© ${currentYear}, by Olivier Lüthy`;

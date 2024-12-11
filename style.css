@@ -16,8 +16,8 @@
 
 body {
   width: 250px;
-  background-color: black;
   color: white;
+  background: linear-gradient(to bottom, #b256de, #195d71);
 }
 
 h1 {
@@ -40,15 +40,26 @@ span {
   padding: 16px 32px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   font-size: 16px;
-  margin: 4px 2px;
   transition-duration: 0.4s;
   cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
 }
 #redirectButton:hover {
   background-color: white;
   color: #0b468a;
+}
+
+#redirectButton img {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+#redirectButton:hover img {
+  filter: invert(100%);
 }
 
 #goToFAQ {
@@ -58,12 +69,22 @@ span {
   padding: 12px 28px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
+  align-items: center;
+  display: flex;
   font-size: 16px;
-  margin: 4px 2px;
   font-size: 0.9rem;
   transition-duration: 0.4s;
   cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+}
+
+#goToFAQ img {
+  width: 22px;
+  height: 22px;
+  filter: invert(100%);
+  vertical-align: middle;
 }
 
 #goToFAQ:hover {

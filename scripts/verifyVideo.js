@@ -23,18 +23,18 @@ function compareVideoWithGoals() {
 
     function checkTitleAndGoals() {
       /* Title of video */
-      const titleElement = document.querySelector(
+      let titleElement = document.querySelector(
         "yt-formatted-string.style-scope.ytd-watch-metadata"
       );
 
       /* Description of video */
-      const descriptionElement = document.querySelector(
+      let descriptionElement = document.querySelector(
         ".yt-core-attributed-string--link-inherit-color"
       );
 
       if (titleElement) {
-        const title = titleElement.innerHTML;
-        const description = descriptionElement.innerText;
+        let title = titleElement.innerHTML;
+        let description = descriptionElement.innerText;
 
         if (title && !messagesDisplayed) {
           chrome.storage.sync.get(
@@ -72,8 +72,8 @@ function compareVideoWithGoals() {
                   .toLowerCase()
                   .replace(/[.,!?]/g, "");
 
-                alert("Titel: " + normalizedTitle);
-                alert("Beschreibung: " + normalizedDescription);
+                // alert("Titel: " + normalizedTitle);
+                // alert("Beschreibung: " + normalizedDescription);
                 // Check if any goal matches the title or description
                 const goalMatches = goals.some((goal) => {
                   const words = goal
