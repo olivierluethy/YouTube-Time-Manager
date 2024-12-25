@@ -7,20 +7,20 @@
     <img src="icon/icon.png" alt="Logo" width="200" height="200">
   </a>
 
-  <h3 align="center">YouTube Disblock</h3>
+  <h3 align="center">YouTube Time Manager</h3>
   <h4 align="center">Google Chrome extension to block YouTube video recommendations without affecting the visibility of open playlists</h4>
 
   <p align="center">
-    Here I'll explain how I developed the application called YouTube Disblock
+    Here I'll explain how I developed the application called YouTube Time Manager
     <br />
-    <a href="github.com/olivierluethy/YouTube-Disblock/blob/master/README.md"><strong>Explore the docs »</strong></a>
+    <a href="github.com/olivierluethy/YouTube Time Manager/blob/master/README.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/olivierluethy/YouTube-Disblock/">View Demo</a>
+    <a href="https://github.com/olivierluethy/YouTube Time Manager/">View Demo</a>
     ·
-    <a href="https://github.com/olivierluethy/YouTube-Disblock/issues">Report Bug</a>
+    <a href="https://github.com/olivierluethy/YouTube Time Manager/issues">Report Bug</a>
     ·
-    <a href="https://github.com/olivierluethy/YouTube-Disblock/issues">Request Feature</a>
+    <a href="https://github.com/olivierluethy/YouTube Time Manager/issues">Request Feature</a>
   </p>
 </p>
 

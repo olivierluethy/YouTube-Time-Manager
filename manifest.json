@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Disblock",
-  "version": "1.0.5",
+  "name": "YouTube Time Manager",
+  "version": "1.0.6",
   "description": "📽️ **Keep Focused, Stay Productive** Hides video recommendations for a distraction-free YouTube experience.",
   "action": {
     "default_popup": "popup.html",
@@ -27,7 +27,7 @@
         "scripts/content.js"]
     }
   ],
-  "permissions": ["storage"],
+  "permissions": ["storage", "activeTab"],
   "web_accessible_resources": [{
     "resources": ["goals.html"],
     "matches": ["<all_urls>"]
