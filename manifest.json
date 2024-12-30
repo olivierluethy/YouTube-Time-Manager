@@ -27,7 +27,7 @@
         "scripts/content.js"]
     }
   ],
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage"],
   "web_accessible_resources": [{
     "resources": ["goals.html"],
     "matches": ["<all_urls>"]

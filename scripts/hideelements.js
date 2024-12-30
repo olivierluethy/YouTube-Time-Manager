@@ -61,3 +61,12 @@ function compareVideoWithGoals() {
 
 // Call the function to start the observer
 compareVideoWithGoals();
+
+// Remove search recommendations when searching in the search bar
+const searchRecommendations = document.querySelector(
+  'div[role="listbox"]'
+);
+
+if(searchRecommendations){
+  searchRecommendations.remove();
+}
