@@ -24,7 +24,7 @@ input[type="text"]:focus {
   outline: none;
   border-radius: 20px;
 }
-.header {
+header {
   background-color: white;
   color: black;
   padding-top: 10px;
@@ -34,11 +34,11 @@ input[type="text"]:focus {
   box-shadow: 0 4px 2px -2px gray;
   text-align: center;
 }
-.header h1 {
+header h1 {
   font-size: 3rem;
   text-align: center;
 }
-/* First row */
+/* First row*/
 .stock-ticker {
   height: 10vh;
   margin-top: 1rem;
@@ -65,10 +65,6 @@ input[type="text"]:focus {
   animation: scroll 20s linear infinite;
 }
 
-.stock-ticker .reverse {
-  animation: scrollReverse 20s linear infinite;
-}
-
 .stock-ticker:hover ul {
   animation-play-state: paused;
 }
@@ -77,39 +73,6 @@ input[type="text"]:focus {
   to {
     transform: translateX(calc(-100% - var(--gap)));
   }
-}
-
-@keyframes scrollReverse {
-  to {
-    transform: translateX(calc(100% + var(--gap)));
-  }
-}
-
-.stock-ticker .company,
-.stock-ticker .price {
-  font-weight: bold;
-}
-
-.stock-ticker .price {
-  margin-inline: 4px;
-}
-
-.stock-ticker .plus::before {
-  content: "↑";
-}
-
-.stock-ticker .minus::before {
-  content: "↓";
-}
-
-.stock-ticker .plus .change,
-.stock-ticker .plus::before {
-  color: #089981;
-}
-
-.stock-ticker .minus .change,
-.stock-ticker .minus::before {
-  color: #f23645;
 }
 
 .quote {
@@ -184,16 +147,16 @@ input[type="text"]:focus {
 }
 /* Second row */
 .stock-flicker {
+  height: 10vh;
   margin-top: -1rem;
   font-size: 15px;
   padding-block: 8px;
   overflow: hidden;
   user-select: none;
-  height: 10vh;
 
-  --gap2: 20px;
+  --gap: 20px;
   display: flex;
-  gap: var(--gap2);
+  gap: var(--gap);
 }
 
 .stock-flicker ul {
@@ -204,54 +167,101 @@ input[type="text"]:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--gap2);
+  gap: var(--gap);
 
-  animation: scrollFlicker 20s linear infinite;
+  animation: scroll2 20s linear infinite;
 }
 
-.stock-flicker .reverse {
-  animation: scrollReverseFlicker 20s linear infinite;
+@keyframes scroll2 {
+  from {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
+/* Falsch
+@keyframes scroll {
+  from {
+    transform: translateX(calc(100% + var(--gap)));
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+} 
+*/
+
+.quote {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -0.5rem;
+  width: 10%;
+  font-family: "Georgia", serif;
+  font-size: 1.2em;
+  font-style: italic;
+  color: #555;
+  border-left: 3px solid #007acc;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+  -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+  -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+  cursor: pointer;
+}
 .stock-flicker:hover ul {
   animation-play-state: paused;
 }
 
-@keyframes scrollFlicker {
-  to {
-    transform: translateX(calc(100% + var(--gap2)));
-  }
+.quote::before {
+  content: "“";
+  font-size: 2em;
+  color: #007acc;
+  position: absolute;
+  left: -1px;
+  top: -3px;
 }
 
-@keyframes scrollReverseFlicker {
-  to {
-    transform: translateX(calc(-100% - var(--gap2)));
-  }
+.quote::after {
+  content: "”";
+  font-size: 2em;
+  color: #007acc;
+  position: absolute;
+  right: 3px;
+  top: -3px;
 }
 
-.stock-flicker .company,
-.stock-flicker .price {
-  font-weight: bold;
+.quote::before,
+.quote::after {
+  pointer-events: none;
 }
 
-.stock-flicker .price {
-  margin-inline: 4px;
+.quote .upper-half,
+.quote .lower-half {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background-color: inherit;
+  overflow: hidden;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s ease-in-out;
 }
 
-.stock-flicker .plus::before {
-  content: "↑";
+.quote .lower-half {
+  top: 50%;
 }
 
-.stock-flicker .minus::before {
-  content: "↓";
+.quote:hover .upper-half {
+  transform: translateX(100%);
 }
 
-.stock-flicker .plus .change,
-.stock-flicker .plus::before {
-  color: #089981;
-}
-
-.stock-flicker .minus .change,
-.stock-flicker .minus::before {
-  color: #f23645;
+.quote:hover .lower-half {
+  transform: translateX(-100%);
 }

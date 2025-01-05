@@ -8,13 +8,13 @@
     <script src="goals.js" defer></script>
   </head>
   <body>
-    <div class="header">
+    <header>
       <h1>Define your goals</h1>
       <h3>
         Enter the skill you want to learn here. Your information will be sent to
         the YouTube API and the videos will appear in the YouTube feed.
       </h3>
-    </div>
+    </header>
     <!-- First row -->
     <div class="stock-ticker">
       <ul>
@@ -33,9 +33,14 @@
         <p class="quote">Guitar</p>
         <p class="quote">Woodworking</p>
         <p class="quote">Knitting/Crocheting</p>
+        <p class="quote">Gardening</p>
+        <p class="quote">Writing</p>
+        <p class="quote">Reading</p>
+        <p class="quote">Chess</p>
+        <p class="quote">Algebra</p>
       </ul>
 
-      <ul aria-hidden="true">
+      <ul aria-hidden="true" style="margin-left: -2.5rem">
         <p class="quote">C#</p>
         <p class="quote">Dancing</p>
         <p class="quote">Video Editing</p>
@@ -51,44 +56,59 @@
         <p class="quote">Guitar</p>
         <p class="quote">Woodworking</p>
         <p class="quote">Knitting/Crocheting</p>
+        <p class="quote">Gardening</p>
+        <p class="quote">Writing</p>
+        <p class="quote">Reading</p>
+        <p class="quote">Chess</p>
+        <p class="quote">Algebra</p>
       </ul>
     </div>
     <!-- Second row -->
     <div class="stock-flicker">
       <ul>
-        <p class="quote">C#</p>
-        <p class="quote">Dancing</p>
-        <p class="quote">Video Editing</p>
-        <p class="quote">Fusion 360</p>
-        <p class="quote">Cooking</p>
-        <p class="quote">Drone Building</p>
-        <p class="quote">Climbing</p>
-        <p class="quote">Photoshop</p>
-        <p class="quote">Photography</p>
-        <p class="quote">Baking</p>
-        <p class="quote">Painting</p>
-        <p class="quote">Drawing</p>
-        <p class="quote">Guitar</p>
-        <p class="quote">Woodworking</p>
-        <p class="quote">Knitting/Crocheting</p>
+        <p class="quote">Yoga</p>
+        <p class="quote">3D Printing</p>
+        <p class="quote">Web Development</p>
+        <p class="quote">Calligraphy</p>
+        <p class="quote">Sculpting</p>
+        <p class="quote">Singing</p>
+        <p class="quote">Piano</p>
+        <p class="quote">Traveling</p>
+        <p class="quote">Fishing</p>
+        <p class="quote">Fitness Training</p>
+        <p class="quote">Swimming</p>
+        <p class="quote">Puzzles</p>
+        <p class="quote">Bird Watching</p>
+        <p class="quote">Photography Editing</p>
+        <p class="quote">DIY Projects</p>
+        <p class="quote">Martial Arts</p>
+        <p class="quote">German</p>
+        <p class="quote">Origami</p>
+        <p class="quote">Astronomy</p>
+        <p class="quote">Cake Decorating</p>
       </ul>
 
-      <ul aria-hidden="true">
-        <p class="quote">C#</p>
-        <p class="quote">Dancing</p>
-        <p class="quote">Video Editing</p>
-        <p class="quote">Fusion 360</p>
-        <p class="quote">Cooking</p>
-        <p class="quote">Drone Building</p>
-        <p class="quote">Climbing</p>
-        <p class="quote">Photoshop</p>
-        <p class="quote">Photography</p>
-        <p class="quote">Baking</p>
-        <p class="quote">Painting</p>
-        <p class="quote">Drawing</p>
-        <p class="quote">Guitar</p>
-        <p class="quote">Woodworking</p>
-        <p class="quote">Knitting/Crocheting</p>
+      <ul aria-hidden="true" style="margin-left: -2.5rem">
+        <p class="quote">Yoga</p>
+        <p class="quote">3D Printing</p>
+        <p class="quote">Web Development</p>
+        <p class="quote">Calligraphy</p>
+        <p class="quote">Sculpting</p>
+        <p class="quote">Singing</p>
+        <p class="quote">Piano</p>
+        <p class="quote">Traveling</p>
+        <p class="quote">Fishing</p>
+        <p class="quote">Fitness Training</p>
+        <p class="quote">Swimming</p>
+        <p class="quote">Puzzles</p>
+        <p class="quote">Bird Watching</p>
+        <p class="quote">Photography Editing</p>
+        <p class="quote">DIY Projects</p>
+        <p class="quote">Martial Arts</p>
+        <p class="quote">German</p>
+        <p class="quote">Origami</p>
+        <p class="quote">Astronomy</p>
+        <p class="quote">Cake Decorating</p>
       </ul>
     </div>
 
@@ -98,6 +118,5 @@
       placeholder="What would you like to learn?"
     />
     <p id="goals"></p>
-    <!-- Here all the activities with the relation of experience listed here -->
   </body>
 </html>
