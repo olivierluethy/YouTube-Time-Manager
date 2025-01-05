@@ -1,61 +1,105 @@
 var input = document.getElementById("goalInput");
 var goalsList = document.getElementById("goals");
+var goalsTable = document.getElementById("goalsTable");
 
-// TODO: Gruppierungen der Ziele hinzufügen
-// Lade die gespeicherten Ziele beim Laden der Seite
+const rangeInput = document.querySelector(".goal-range");
+const valueDisplay = document.querySelector(".range-value");
+
+rangeInput.addEventListener("input", () => {
+  valueDisplay.textContent = "Current Value: " + rangeInput.value;
+});
+
+// Load saved goals when the page loads
 chrome.storage.sync.get("goals", function (data) {
   if (data.goals) {
     data.goals.forEach(function (goal) {
-      addGoalToList(goal);
+      addGoalToList(goal.text, goal.value, goal.date); // Include date
     });
   }
 });
 
-// Funktion, um ein Ziel zur Liste hinzuzufügen
-function addGoalToList(goalText) {
-  var listItem = document.createElement("p");
-  listItem.className = "goal-item";
-  listItem.textContent = goalText;
+// Function to add a goal to the list
+function addGoalToList(goalText, rangeValue, date) {
+  var row = document.createElement("tr");
+  row.className = "goal-item";
 
-  // Erstelle den "X"-Button
-  var removeButton = document.createElement("span");
-  removeButton.textContent = "X";
+  var goalCell = document.createElement("td");
+  goalCell.textContent = goalText;
+
+  var valueCell = document.createElement("td");
+  valueCell.textContent = rangeValue;
+
+  var dateCell = document.createElement("td"); // New cell for the date
+  dateCell.textContent = date;
+
+  var actionCell = document.createElement("td");
+  var removeButton = document.createElement("button");
+  removeButton.textContent = "Remove";
   removeButton.className = "remove-goal";
-  removeButton.title = "Remove this goal";
   removeButton.onclick = function () {
-    removeGoal(goalText, listItem);
+    removeGoal(goalText, row);
   };
 
-  listItem.appendChild(removeButton);
-  goalsList.appendChild(listItem);
+  actionCell.appendChild(removeButton);
+  row.appendChild(goalCell);
+  row.appendChild(valueCell);
+  row.appendChild(dateCell); // Append the date cell
+  row.appendChild(actionCell);
+  goalsList.appendChild(row);
+
+  // Check if the table should be displayed
+  toggleTableVisibility();
 }
 
-// Event Listener für die Eingabe
+function formatDateForGoalWithYear() {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'long' }); // Get the full month name
+  const year = date.getFullYear();
+
+  // Add the appropriate suffix for the day
+  const suffix = (day) => {
+      if (day > 3 && day < 21) return 'th'; // Catch 11th-13th
+      switch (day % 10) {
+          case 1: return 'st';
+          case 2: return 'nd';
+          case 3: return 'rd';
+          default: return 'th';
+      }
+  };
+
+  return `${month} ${day}${suffix(day)}, ${year}`; // Return formatted date
+}
+
+// Event Listener for the input
 input.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
-    event.preventDefault(); // Verhindert das Standardverhalten der Enter-Taste
+    event.preventDefault(); // Prevent default Enter key behavior
 
-    // Hole den eingegebenen Text
+    // Get the entered text
     var goalText = input.value.trim();
+    var rangeValue = rangeInput.value; // Get the current range value
 
     if (goalText) {
       // Regular expression to check for special characters
       var isValidInput = /^[a-zA-Z0-9\s]*$/.test(goalText); // Allows letters, numbers, and spaces
 
       if (isValidInput) {
-        addGoalToList(goalText);
+        var currentDate = formatDateForGoalWithYear(); // Use the function for "5th January"
 
-        // Leere das Eingabefeld nach dem Hinzufügen
+        addGoalToList(goalText, rangeValue, currentDate); // Pass the date
+
+        // Clear the input field after adding
         input.value = "";
 
-        // Speichere das neue Ziel im Chrome Storage
+        // Save the new goal in Chrome Storage
         chrome.storage.sync.get("goals", function (data) {
           var goals = data.goals || [];
-          goals.push(goalText); // Füge das neue Ziel hinzu
+          goals.push({ text: goalText, value: rangeValue, date: currentDate }); // Add the new goal with its value and date
 
-          // Speichere das aktualisierte Array zurück in den Chrome Storage
+          // Save the updated array back to Chrome Storage
           chrome.storage.sync.set({ goals: goals }, function () {
-            console.log("Ziele gespeichert:", goals);
+            console.log("Goals saved:", goals);
           });
         });
       } else {
@@ -67,20 +111,33 @@ input.addEventListener("keypress", function (event) {
   }
 });
 
-// Funktion, um ein Ziel zu entfernen
-function removeGoal(goalText, listItem) {
-  // Entferne das Listenelement
-  goalsList.removeChild(listItem);
+// Function to remove a goal
+function removeGoal(goalText, row) {
+  // Remove the goal from the displayed table
+  goalsList.removeChild(row);
 
-  // Aktualisiere den Chrome Storage
+  // Remove the goal from Chrome Storage
   chrome.storage.sync.get("goals", function (data) {
     var goals = data.goals || [];
-    // Entferne das Ziel aus dem Array
-    goals = goals.filter((goal) => goal !== goalText);
+    goals = goals.filter((goal) => goal.text !== goalText); // Filter out the removed goal
 
-    // Speichere das aktualisierte Array zurück in den Chrome Storage
+    // Save the updated array back to Chrome Storage
     chrome.storage.sync.set({ goals: goals }, function () {
-      console.log("Ziele aktualisiert:", goals);
+      console.log("Updated goals after removal:", goals);
     });
   });
+
+  // Check if the table should be displayed
+  toggleTableVisibility();
+}
+
+// Function to toggle the visibility of the table
+function toggleTableVisibility() {
+  if (goalsList.children.length === 0) {
+    goalsTable.style.display = "none"; // Hide the table if no goals
+    document.querySelector(".inputExamples").style.display = "block";
+  } else {
+    goalsTable.style.display = ""; // Show the table if there are goals
+    document.querySelector(".inputExamples").style.display = "none";
+  }
 }
