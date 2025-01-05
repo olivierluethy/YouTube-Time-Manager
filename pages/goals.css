@@ -1,69 +1,140 @@
 body {
-  margin: 0;
   padding: 0;
-  text-align: center;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #131722;
   background-color: black;
-  color: white;
-  font-family: Arial, Helvetica, sans-serif;
 }
 input[type="text"] {
   width: 50%;
-  padding: 12px 20px;
-  margin: 16px 0;
+  padding: 4px 20px;
+  margin-left: 25%;
+  font-size: 1.5rem;
   text-align: center;
-  border: none;
+  border: 2px solid transparent;
   box-sizing: border-box;
   box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   transition-duration: 0.5s;
 }
-/* When the input field gets focus, change its width to 100% */
 input[type="text"]:focus {
+  outline: none;
   border-radius: 20px;
 }
 .header {
   background-color: white;
   color: black;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   width: 100%;
   /* https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only */
   box-shadow: 0 4px 2px -2px gray;
+  text-align: center;
 }
-h1 {
-  font-size: 50px;
+.header h1 {
+  font-size: 3rem;
+  text-align: center;
 }
-#goals {
-  font-size: 20px;
+/* First row */
+.stock-ticker {
+  height: 10vh;
+  margin-top: 1rem;
+  font-size: 15px;
+  padding-block: 8px;
+  overflow: hidden;
+  user-select: none;
+
+  --gap: 20px;
+  display: flex;
+  gap: var(--gap);
 }
-span.remove-goal {
-  display: inline-block;
-  margin-left: 1rem;
-  color: red;
-  transition: all 0.5s ease;
+
+.stock-ticker ul {
+  list-style: none;
+  flex-shrink: 0;
+  text-align: center;
+  min-width: 180%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap);
+
+  animation: scroll 20s linear infinite;
 }
-.remove-goal:hover {
-  cursor: pointer;
-  transform: scale(1.5);
+
+.stock-ticker .reverse {
+  animation: scrollReverse 20s linear infinite;
 }
+
+.stock-ticker:hover ul {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes scrollReverse {
+  to {
+    transform: translateX(calc(100% + var(--gap)));
+  }
+}
+
+.stock-ticker .company,
+.stock-ticker .price {
+  font-weight: bold;
+}
+
+.stock-ticker .price {
+  margin-inline: 4px;
+}
+
+.stock-ticker .plus::before {
+  content: "↑";
+}
+
+.stock-ticker .minus::before {
+  content: "↓";
+}
+
+.stock-ticker .plus .change,
+.stock-ticker .plus::before {
+  color: #089981;
+}
+
+.stock-ticker .minus .change,
+.stock-ticker .minus::before {
+  color: #f23645;
+}
+
 .quote {
+  position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 50%;
+  margin-top: -0.5rem;
+  width: 10%;
   font-family: "Georgia", serif;
-  font-size: 1.2em; /* Slightly smaller font */
+  font-size: 1.2em;
   font-style: italic;
   color: #555;
-  border-left: 3px solid #007acc; /* Thinner border */
-  padding: 8px 12px; /* Reduced padding */
-  background-color: #fafafa; /* Subtler background color */
-  position: relative;
+  border-left: 3px solid #007acc;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+  -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+  -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .quote::before {
   content: "“";
-  font-size: 2em; /* Slightly smaller quotes */
+  font-size: 2em;
   color: #007acc;
   position: absolute;
   left: -1px;
@@ -77,4 +148,110 @@ span.remove-goal {
   position: absolute;
   right: 3px;
   top: -3px;
+}
+
+.quote::before,
+.quote::after {
+  pointer-events: none;
+}
+
+.quote .upper-half,
+.quote .lower-half {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background-color: inherit;
+  overflow: hidden;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s ease-in-out;
+}
+
+.quote .lower-half {
+  top: 50%;
+}
+
+.quote:hover .upper-half {
+  transform: translateX(100%);
+}
+
+.quote:hover .lower-half {
+  transform: translateX(-100%);
+}
+/* Second row */
+.stock-flicker {
+  margin-top: -1rem;
+  font-size: 15px;
+  padding-block: 8px;
+  overflow: hidden;
+  user-select: none;
+  height: 10vh;
+
+  --gap2: 20px;
+  display: flex;
+  gap: var(--gap2);
+}
+
+.stock-flicker ul {
+  list-style: none;
+  flex-shrink: 0;
+  text-align: center;
+  min-width: 180%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap2);
+
+  animation: scrollFlicker 20s linear infinite;
+}
+
+.stock-flicker .reverse {
+  animation: scrollReverseFlicker 20s linear infinite;
+}
+
+.stock-flicker:hover ul {
+  animation-play-state: paused;
+}
+
+@keyframes scrollFlicker {
+  to {
+    transform: translateX(calc(100% + var(--gap2)));
+  }
+}
+
+@keyframes scrollReverseFlicker {
+  to {
+    transform: translateX(calc(-100% - var(--gap2)));
+  }
+}
+
+.stock-flicker .company,
+.stock-flicker .price {
+  font-weight: bold;
+}
+
+.stock-flicker .price {
+  margin-inline: 4px;
+}
+
+.stock-flicker .plus::before {
+  content: "↑";
+}
+
+.stock-flicker .minus::before {
+  content: "↓";
+}
+
+.stock-flicker .plus .change,
+.stock-flicker .plus::before {
+  color: #089981;
+}
+
+.stock-flicker .minus .change,
+.stock-flicker .minus::before {
+  color: #f23645;
 }
