@@ -102,8 +102,6 @@ h2 {
   padding: 8px 12px;
   background-color: #fafafa;
   box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
-  -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
-  -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   overflow: hidden;
   cursor: pointer;
 }
@@ -158,6 +156,29 @@ h2 {
 .quote:hover .lower-half {
   transform: translateX(-100%);
 }
+.quote-button {
+  opacity: 0; /* Button initially hidden */
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px); /* Slightly move down initially */
+  padding: 8px 18px;
+  font-size: 1rem;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.5s ease; /* Smooth animation */
+  pointer-events: none; /* Disable interaction when hidden */
+}
+
+.quote:hover .quote-button {
+  opacity: 1; /* Fully visible on hover */
+  transform: translateX(-50%) translateY(0); /* Move to original position */
+  pointer-events: auto; /* Enable interaction */
+}
+
 /* Second row */
 .stock-flicker {
   height: 15vh;

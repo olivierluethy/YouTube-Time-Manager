@@ -36,7 +36,7 @@ function addGoalToList(goalText, rangeValue, date) {
   var removeButton = document.createElement("button");
   removeButton.textContent = "X";
   removeButton.className = "remove-goal";
-  removeButton.title="Remove Goal"
+  removeButton.title = "Remove Goal";
   removeButton.onclick = function () {
     removeGoal(goalText, row);
   };
@@ -256,3 +256,17 @@ function toggleTableVisibility() {
     document.querySelector(".inputExamples").style.display = "none";
   }
 }
+// Alle Buttons mit der Klasse 'quote-button' auswählen
+const buttons = document.querySelectorAll(".quote-button");
+
+// Für jeden Button einen Click-Event-Listener hinzufügen
+buttons.forEach((button) => {
+  button.addEventListener("click", function () {
+    // Den Text des übergeordneten <p>-Elements abrufen
+    const quoteText = this.parentElement.childNodes[0].nodeValue.trim();
+    // Das Eingabefeld auswählen
+    const inputField = document.getElementById("goalInput");
+    // Den Text in das Eingabefeld einfügen
+    inputField.value = quoteText;
+  });
+});
