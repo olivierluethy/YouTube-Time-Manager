@@ -18,7 +18,6 @@ chrome.storage.sync.get("goals", function (data) {
   }
 });
 
-// Function to add a goal to the list
 function addGoalToList(goalText, rangeValue, date) {
   var row = document.createElement("tr");
   row.className = "goal-item";
@@ -33,6 +32,7 @@ function addGoalToList(goalText, rangeValue, date) {
   dateCell.textContent = date;
 
   var actionCell = document.createElement("td");
+
   var removeButton = document.createElement("button");
   removeButton.textContent = "X";
   removeButton.className = "remove-goal";
@@ -41,6 +41,15 @@ function addGoalToList(goalText, rangeValue, date) {
     removeGoal(goalText, row);
   };
 
+  var editButton = document.createElement("button");
+  editButton.textContent = "Edit"; // Set the button text
+  editButton.className = "edit-goal"; // Set the class name
+  editButton.title = "Edit Goal"; // Set the title
+  editButton.onclick = function () {
+    editGoal(row);
+  };
+
+  actionCell.appendChild(editButton);
   actionCell.appendChild(removeButton);
   row.appendChild(goalCell);
   row.appendChild(valueCell);
@@ -50,6 +59,133 @@ function addGoalToList(goalText, rangeValue, date) {
 
   // Check if the table should be displayed
   toggleTableVisibility();
+}
+
+function editGoal(row) {
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the input fields
+  var goalInput = document.getElementById("goalTextEdit");
+  var valueInput = document.getElementById("rangeValueEdit");
+  var rangeValueDisplay = document.querySelector(".range-valueEdit");
+
+  // Extract current goal values from the row
+  var originalText = row.cells[0].textContent;
+  var originalValue = parseInt(row.cells[1].textContent, 10);
+
+  // Set the current values in the input fields
+  goalInput.value = originalText; // Set goal text
+  valueInput.value = originalValue; // Set range value
+  rangeValueDisplay.textContent = originalValue; // Display range value
+
+  // Open the modal
+  modal.style.display = "block";
+
+  // Update the displayed value when the slider is moved
+  valueInput.oninput = function () {
+    rangeValueDisplay.textContent = this.value;
+  };
+
+  // Close button functionality
+  var closeButtons = document.querySelectorAll(".close");
+  closeButtons.forEach(function (button) {
+    button.onclick = function () {
+      modal.style.display = "none";
+    };
+  });
+
+  // Cancel modal functionality
+  var closeBtn = document.querySelector(".closeBtn");
+  closeBtn.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  // Close the modal when clicking outside
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  // Save changes button functionality
+  document.getElementById("saveChanges").onclick = function () {
+    // Get the updated values from the input fields
+    var updatedText = goalInput.value.trim();
+    var updatedValue = parseInt(valueInput.value, 10);
+
+    // Check if there are changes
+    if (updatedText === originalText && updatedValue === originalValue) {
+      // No changes detected, close the modal without saving
+      modal.style.display = "none";
+      return;
+    }
+
+    // Generate a new prompt based on updatedValue
+    const generatePrompt = (goalText, value) => {
+      if (value >= 0 && value <= 25) {
+        const beginnerPrompts = [
+          `${goalText} for absolute beginners`,
+          `${goalText} tutorial for dummies`,
+          `Easiest way to learn ${goalText}`,
+          `${goalText} - The complete beginner's guide`,
+          `${goalText} step-by-step guide`,
+        ];
+        return beginnerPrompts[
+          Math.floor(Math.random() * beginnerPrompts.length)
+        ];
+      } else if (value > 25 && value <= 75) {
+        const advancedPrompts = [
+          `Advanced ${goalText} concepts explained`,
+          `${goalText} in-depth tutorial`,
+          `Mastering ${goalText}: Best practices`,
+          `${goalText} advanced techniques`,
+          `${goalText} real-world applications`,
+        ];
+        return advancedPrompts[
+          Math.floor(Math.random() * advancedPrompts.length)
+        ];
+      } else if (value > 75 && value <= 100) {
+        const proPrompts = [
+          `Pioneering innovations in ${goalText}`,
+          `State-of-the-art ${goalText} methodologies`,
+          `Exploring the future of ${goalText}`,
+          `Theoretical foundations and breakthroughs in ${goalText}`,
+          `Unsolved problems in ${goalText}`,
+        ];
+        return proPrompts[Math.floor(Math.random() * proPrompts.length)];
+      }
+    };
+
+    const newPrompt = generatePrompt(updatedText, updatedValue);
+
+    // Update Chrome Storage
+    chrome.storage.sync.get("goals", function (data) {
+      var goals = data.goals || [];
+
+      // Find the index of the goal to update
+      const goalIndex = goals.findIndex((goal) => goal.text === originalText);
+
+      if (goalIndex !== -1) {
+        // Update the goal with new values
+        goals[goalIndex].text = updatedText;
+        goals[goalIndex].value = updatedValue;
+        goals[goalIndex].prompt = newPrompt;
+      }
+
+      // Save the updated array back to Chrome Storage
+      chrome.storage.sync.set({ goals: goals }, function () {
+        console.log("Updated goals:", goals);
+      });
+    });
+
+    // Update the table row with new values
+    row.cells[0].textContent = updatedText; // Update goal text
+    row.cells[1].textContent = updatedValue; // Update range value
+
+    // Close the modal
+    modal.style.display = "none";
+  };
 }
 
 function formatDateForGoalWithYearAndTime() {

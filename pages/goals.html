@@ -265,5 +265,39 @@
         <tbody id="goals"></tbody>
       </table>
     </div>
+
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Goal</h2>
+          <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <label for="goalTextEdit">Goal:</label>
+          <input
+            type="text"
+            id="goalTextEdit"
+            placeholder="Enter your goal"
+            required
+          />
+          <label for="rangeValueEdit">Value:</label>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value="50"
+            class="goal-range"
+            id="rangeValueEdit"
+          />
+          <span class="range-valueEdit"></span>
+          <!-- Initial value display -->
+        </div>
+        <div class="modal-footer">
+          <button id="saveChanges" class="btn">Save Changes</button>
+          <button class="closeBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

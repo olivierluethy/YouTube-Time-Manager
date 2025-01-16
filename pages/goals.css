@@ -15,20 +15,22 @@ body {
   min-height: 100vh;
   overflow-y: hidden;
 }
-input[type="text"] {
+#goalInput[type="text"] {
   width: 50%;
-  padding: 4px 20px;
+  padding: 10px;
   margin-left: 25%;
   font-size: 1.5rem;
   text-align: center;
-  border: 2px solid transparent;
+  border: 1px solid black;
+  border-radius: 4px;
+  margin-bottom: 20px;
   box-sizing: border-box;
   box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   transition-duration: 0.5s;
 }
-input[type="text"]:focus {
+#goalInput[type="text"]:focus {
   outline: none;
   border-radius: 20px;
 }
@@ -156,6 +158,7 @@ h2 {
 .quote:hover .lower-half {
   transform: translateX(-100%);
 }
+/* https://chatgpt.com/c/67883478-52d4-8008-bfdd-18dea34bb90c */
 .quote-button {
   opacity: 0; /* Button initially hidden */
   position: absolute;
@@ -315,12 +318,31 @@ h2 {
   font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
+  margin-left: 2rem;
   transition: all 0.5s ease;
 }
 .remove-goal:hover {
   cursor: pointer;
   box-shadow: black 0px 0px 15px 0px;
   transform: scale(1.5);
+}
+.edit-goal {
+  display: inline-block;
+  background-color: darkorange;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+.edit-goal:hover {
+  cursor: pointer;
+  box-shadow: black 0px 0px 15px 0px;
+  transform: scale(1.1);
 }
 .enter {
   background-color: white; /* Light gray for better contrast */
@@ -339,14 +361,6 @@ h2 {
   font-size: 1.2rem; /* Larger font for the label */
   margin-bottom: 10px; /* Space between label and input */
   display: block; /* Make label a block element */
-}
-
-input[type="text"] {
-  width: 50%; /* Set width for input */
-  padding: 10px; /* Add padding for comfort */
-  border: 1px solid black; /* Light border */
-  border-radius: 4px; /* Rounded corners */
-  margin-bottom: 20px; /* Space below input */
 }
 
 .range-container {
@@ -465,4 +479,117 @@ tbody tr:hover {
   box-shadow: 0px 0px 15px 0px white;
   -webkit-box-shadow: 0px 0px 15px 0px white;
   -moz-box-shadow: 0px 0px 15px 0px white;
+}
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.7
+  ); /* Darker background for better contrast */
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #ffffff; /* White background for content */
+  margin: auto;
+  padding: 30px; /* Increased padding for better spacing */
+  border: none; /* No border */
+  width: 40%; /* Adjusted width */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Deeper shadow for a more elevated look */
+  border-radius: 10px; /* More rounded corners */
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  color: #333; /* Darker text for better readability */
+  margin: 0; /* Remove default margin */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+}
+
+/* Button styles */
+.btn, .closeBtn {
+  background-color: #5cb85c;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn:hover, .closeBtn:hover {
+  background-color: #4cae4c;
+}
+
+/* Input styles */
+.modal-body label {
+  display: block; /* Block display for labels */
+  margin: 10px 0 5px; /* Spacing for labels */
+  font-weight: bold; /* Bold labels */
+}
+
+.modal-body input[type="text"],
+.modal-body input[type="range"] {
+  width: 100%; /* Full width for inputs */
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+.modal-body input[type="range"] {
+  -webkit-appearance: none; /* Remove default styling */
+  height: 5px; /* Height of the slider */
+  background: #ddd; /* Background color of the slider */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.modal-body input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Remove default styling */
+  appearance: none; /* Remove default styling */
+  width: 15px; /* Width of the thumb */
+  height: 15px; /* Height of the thumb */
+  border-radius: 50%; /* Round thumb */
+  background: #5cb85c; /* Green thumb color */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.range-valueEdit {
+  display: block; /* Display the range value below the slider */
+  text-align: center; /* Center the text */
+  margin-top: 10px; /* Spacing above the value */
+  font-weight: bold; /* Bold text for emphasis */
+  color: #333; /* Darker color for better readability */
 }
