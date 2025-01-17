@@ -218,17 +218,6 @@ h2 {
   }
 }
 
-/* Falsch
-@keyframes scroll {
-  from {
-    transform: translateX(calc(100% + var(--gap)));
-  }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-  }
-} 
-*/
-
 .quote {
   position: relative;
   margin-left: auto;
@@ -352,9 +341,27 @@ h2 {
   -webkit-box-shadow: 0px 0px 15px 0px white;
   -moz-box-shadow: 0px 0px 15px 0px white;
   width: 50%;
-  /* margin-top: -2rem; */
   margin-left: auto;
   margin-right: auto;
+}
+
+.enter button {
+  background-color: #04aa6d; /* Green */
+  border: 2px solid #04aa6d;
+  color: white;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: none;
+  font-size: 16px;
+  margin-left: 1rem;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.enter button:hover {
+  background-color: white;
+  color: black;
 }
 
 .goal-label {
@@ -509,6 +516,33 @@ tbody tr:hover {
   width: 40%; /* Adjusted width */
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Deeper shadow for a more elevated look */
   border-radius: 10px; /* More rounded corners */
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
 }
 
 /* Modal Header */
@@ -537,7 +571,8 @@ tbody tr:hover {
 }
 
 /* Button styles */
-.btn, .closeBtn {
+.btn,
+.closeBtn {
   background-color: #5cb85c;
   color: white;
   padding: 10px 20px;
@@ -548,7 +583,8 @@ tbody tr:hover {
   transition: background-color 0.3s;
 }
 
-.btn:hover, .closeBtn:hover {
+.btn:hover,
+.closeBtn:hover {
   background-color: #4cae4c;
 }
 

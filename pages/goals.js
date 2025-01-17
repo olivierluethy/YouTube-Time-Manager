@@ -61,6 +61,29 @@ function addGoalToList(goalText, rangeValue, date) {
   toggleTableVisibility();
 }
 
+// Um für jedes Ziel eine Identifikation anhand von einer ID hinzufügt. Diese ID wird nur für die Erstellung eines Zieles genutzt und das nur einmal pro Ziel.
+async function generateUniqueID(goal) {
+  const stringToHash = `${goal.text}-${goal.value}-${goal.prompt || ""}`;
+  const salt = Math.random().toString(36).substring(2, 15);
+  const combinedString = stringToHash + salt;
+
+  // Konvertiere den String in ein ArrayBuffer
+  const encoder = new TextEncoder();
+  const data = encoder.encode(combinedString);
+
+  // Erzeuge den Hash
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  // Konvertiere den Hash in einen Hex-String
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 5);
+
+  return `${timestamp}-${randomString}-${hash.substring(0, 16)}`;
+}
+
 function editGoal(row) {
   // Get the modal
   var modal = document.getElementById("myModal");
@@ -110,82 +133,88 @@ function editGoal(row) {
 
   // Save changes button functionality
   document.getElementById("saveChanges").onclick = function () {
-    // Get the updated values from the input fields
     var updatedText = goalInput.value.trim();
     var updatedValue = parseInt(valueInput.value, 10);
 
-    // Check if there are changes
+    // Überprüfe, ob sich der Name oder Wert geändert hat
     if (updatedText === originalText && updatedValue === originalValue) {
-      // No changes detected, close the modal without saving
       modal.style.display = "none";
       return;
     }
 
-    // Generate a new prompt based on updatedValue
-    const generatePrompt = (goalText, value) => {
-      if (value >= 0 && value <= 25) {
-        const beginnerPrompts = [
-          `${goalText} for absolute beginners`,
-          `${goalText} tutorial for dummies`,
-          `Easiest way to learn ${goalText}`,
-          `${goalText} - The complete beginner's guide`,
-          `${goalText} step-by-step guide`,
-        ];
-        return beginnerPrompts[
-          Math.floor(Math.random() * beginnerPrompts.length)
-        ];
-      } else if (value > 25 && value <= 75) {
-        const advancedPrompts = [
-          `Advanced ${goalText} concepts explained`,
-          `${goalText} in-depth tutorial`,
-          `Mastering ${goalText}: Best practices`,
-          `${goalText} advanced techniques`,
-          `${goalText} real-world applications`,
-        ];
-        return advancedPrompts[
-          Math.floor(Math.random() * advancedPrompts.length)
-        ];
-      } else if (value > 75 && value <= 100) {
-        const proPrompts = [
-          `Pioneering innovations in ${goalText}`,
-          `State-of-the-art ${goalText} methodologies`,
-          `Exploring the future of ${goalText}`,
-          `Theoretical foundations and breakthroughs in ${goalText}`,
-          `Unsolved problems in ${goalText}`,
-        ];
-        return proPrompts[Math.floor(Math.random() * proPrompts.length)];
-      }
-    };
-
     const newPrompt = generatePrompt(updatedText, updatedValue);
 
-    // Update Chrome Storage
     chrome.storage.sync.get("goals", function (data) {
       var goals = data.goals || [];
 
-      // Find the index of the goal to update
       const goalIndex = goals.findIndex((goal) => goal.text === originalText);
 
       if (goalIndex !== -1) {
-        // Update the goal with new values
+        // Wenn sich der Name geändert hat, entferne den alten Eintrag aus `storedGoals`
+        if (updatedText !== originalText) {
+          chrome.storage.sync.get("doubleGoals", (res) => {
+            let storedGoals = res.doubleGoals || {};
+            delete storedGoals[originalText];
+            chrome.storage.sync.set({ doubleGoals: storedGoals });
+          });
+        }
+
+        // Aktualisiere das Ziel
         goals[goalIndex].text = updatedText;
         goals[goalIndex].value = updatedValue;
         goals[goalIndex].prompt = newPrompt;
       }
 
-      // Save the updated array back to Chrome Storage
       chrome.storage.sync.set({ goals: goals }, function () {
         console.log("Updated goals:", goals);
       });
     });
 
-    // Update the table row with new values
-    row.cells[0].textContent = updatedText; // Update goal text
-    row.cells[1].textContent = updatedValue; // Update range value
+    row.cells[0].textContent = updatedText;
+    row.cells[1].textContent = updatedValue;
 
-    // Close the modal
     modal.style.display = "none";
   };
+}
+
+function generatePrompt(goalText, rangeValue) {
+  let prompt = ""; // Prompt wird initialisiert
+
+  if (rangeValue >= 0 && rangeValue <= 25) {
+    // Beginner-Prompts
+    const beginnerPrompts = [
+      `${goalText} for absolute beginners`,
+      `${goalText} tutorial for dummies`,
+      `Easiest way to learn ${goalText}`,
+      `${goalText} - The complete beginner's guide`,
+      `${goalText} step-by-step guide`,
+    ];
+    prompt =
+      beginnerPrompts[Math.floor(Math.random() * beginnerPrompts.length)];
+  } else if (rangeValue > 25 && rangeValue <= 75) {
+    // Advanced-Prompts
+    const advancedPrompts = [
+      `Advanced ${goalText} concepts explained`,
+      `${goalText} in-depth tutorial`,
+      `Mastering ${goalText}: Best practices`,
+      `${goalText} advanced techniques`,
+      `${goalText} real-world applications`,
+    ];
+    prompt =
+      advancedPrompts[Math.floor(Math.random() * advancedPrompts.length)];
+  } else if (rangeValue > 75 && rangeValue <= 100) {
+    // Pro-Prompts
+    const proPrompts = [
+      `Pioneering innovations in ${goalText}`,
+      `State-of-the-art ${goalText} methodologies`,
+      `Exploring the future of ${goalText}`,
+      `Theoretical foundations and breakthroughs in ${goalText}`,
+      `Unsolved problems in ${goalText}`,
+    ];
+    prompt = proPrompts[Math.floor(Math.random() * proPrompts.length)];
+  }
+
+  return prompt; // Gib den generierten Prompt zurück
 }
 
 function formatDateForGoalWithYearAndTime() {
@@ -224,6 +253,69 @@ function formatDateForGoalWithYearAndTime() {
   )}, ${year} at ${formattedHours}:${formattedMinutes} ${ampm}`;
 }
 
+input.onkeyup = function () {
+  const goalInput = document.getElementById("goalInput");
+  const subGoalButton = document.getElementById("subGoal");
+
+  if (goalInput.value.trim() === "") {
+    subGoalButton.style.display = "none";
+  } else {
+    subGoalButton.style.display = "inline-block";
+  }
+};
+
+document.getElementById("subGoal").addEventListener("click", function () {
+  // Get the entered text
+  var goalText = input.value.trim();
+  var rangeValue = rangeInput.value; // Get the current range value
+
+  getEnteredInputInformation(goalText, rangeValue);
+});
+
+async function getEnteredInputInformation(goalText, rangeValue) {
+  // Regular expression to check for special characters
+  var isValidInput = /^[a-zA-Z0-9\s#\-_äöüÄÖÜ]*$/.test(goalText);
+
+  if (isValidInput) {
+    var currentDate = formatDateForGoalWithYearAndTime(); // Use the function for "5th January"
+
+    // Clear the input field after adding
+    input.value = "";
+
+    // Save the new goal in Chrome Storage
+    chrome.storage.sync.get("goals", async function (data) {
+      var goals = data.goals || [];
+
+      let prompt = generatePrompt(goalText, rangeValue);
+
+      // Generate the unique ID for the goal
+      let hash = await generateUniqueID({
+        text: goalText,
+        value: rangeValue,
+        prompt: prompt,
+      });
+
+      // Add new goal data with the unique ID
+      goals.push({
+        id: hash, // Add the unique ID here
+        text: goalText,
+        value: rangeValue,
+        date: currentDate,
+        prompt: prompt,
+      });
+
+      addGoalToList(goalText, rangeValue, currentDate);
+
+      // Save the updated array back to Chrome Storage
+      chrome.storage.sync.set({ goals: goals }, function () {
+        console.log("Goals saved:", goals);
+      });
+    });
+  } else {
+    alert("Please enter a valid goal (no special characters allowed).");
+  }
+}
+
 // Event Listener for the input
 input.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
@@ -234,126 +326,7 @@ input.addEventListener("keypress", function (event) {
     var rangeValue = rangeInput.value; // Get the current range value
 
     if (goalText) {
-      // Regular expression to check for special characters
-      var isValidInput = /^[a-zA-Z0-9\s]*$/.test(goalText); // Allows letters, numbers, and spaces
-
-      if (isValidInput) {
-        var currentDate = formatDateForGoalWithYearAndTime(); // Use the function for "5th January"
-
-        addGoalToList(goalText, rangeValue, currentDate); // Pass the date
-
-        // Clear the input field after adding
-        input.value = "";
-
-        // Save the new goal in Chrome Storage
-        chrome.storage.sync.get("goals", function (data) {
-          var goals = data.goals || [];
-          let prompt = ""; // Declare prompt outside the conditionals
-
-          // Beginner Prompts
-          if (rangeValue >= 0 && rangeValue <= 25) {
-            const beginnerPrompts = [
-              `${goalText} for absolute beginners`,
-              `${goalText} tutorial for dummies`,
-              `Easiest way to learn ${goalText}`,
-              `${goalText} - The complete beginner's guide`,
-              `${goalText} step-by-step guide`,
-              `Best free resources to learn ${goalText}`,
-              `${goalText} video tutorial for beginners`,
-              `Interactive ${goalText} learning platform`,
-              `Top courses to learn ${goalText}`,
-              `${goalText} crash course`,
-            ];
-            prompt =
-              beginnerPrompts[
-                Math.floor(Math.random() * beginnerPrompts.length)
-              ];
-          }
-          // Advanced Prompts
-          else if (rangeValue > 25 && rangeValue <= 75) {
-            const advancedPrompts = [
-              `Advanced ${goalText} concepts explained`,
-              `${goalText} in-depth tutorial`,
-              `Mastering ${goalText}: Best practices`,
-              `${goalText} advanced techniques`,
-              `${goalText} real-world applications`,
-              `${goalText} optimization strategies`,
-              `How to solve complex problems in ${goalText}`,
-              `Advanced ${goalText} course 2025`,
-              `${goalText} expert guide`,
-              `High-level ${goalText} use cases`,
-              `Best tools for ${goalText} professionals`,
-              `Deep dive into ${goalText} frameworks`,
-              `Exploring the latest trends in ${goalText}`,
-              `Expert-level ${goalText} tutorials`,
-              `${goalText} advanced tips and tricks`,
-              `Common pitfalls in ${goalText} and how to avoid them`,
-              `Complete ${goalText} mastery roadmap`,
-              `Cutting-edge techniques for ${goalText}`,
-              `${goalText} certification preparation guide`,
-              `Top books to become an expert in ${goalText}`,
-              `${goalText} advanced workflows and tools`,
-              `${goalText} performance tuning and scaling`,
-              `Implementing ${goalText} in enterprise projects`,
-              `Research papers on ${goalText} (2025)`,
-            ];
-            prompt =
-              advancedPrompts[
-                Math.floor(Math.random() * advancedPrompts.length)
-              ];
-          }
-          // Pro Prompts
-          else if (rangeValue > 75 && rangeValue <= 100) {
-            const proPrompts = [
-              `Pioneering innovations in ${goalText}`,
-              `State-of-the-art ${goalText} methodologies`,
-              `Exploring the future of ${goalText}`,
-              `Theoretical foundations and breakthroughs in ${goalText}`,
-              `Unsolved problems in ${goalText}`,
-              `How to contribute to ${goalText} research`,
-              `Top conferences and events for ${goalText} experts`,
-              `Writing advanced algorithms for ${goalText}`,
-              `Open-source projects to master ${goalText}`,
-              `Exploring ${goalText}'s role in emerging technologies`,
-              `Interdisciplinary applications of ${goalText}`,
-              `Deep learning and ${goalText}: Synergies and challenges`,
-              `${goalText} research papers 2025`,
-              `Becoming a thought leader in ${goalText}`,
-              `How ${goalText} is disrupting industries in 2025`,
-              `Expert-level ${goalText} optimization techniques`,
-              `Building cutting-edge solutions with ${goalText}`,
-              `Joining elite forums and communities for ${goalText}`,
-              `Exploring ${goalText} in highly complex systems`,
-              `Contributing to ${goalText} standards and protocols`,
-              `Next-gen tools and frameworks for ${goalText}`,
-              `Challenging your ${goalText} knowledge with real-world scenarios`,
-              `Participate in ${goalText} hackathons and competitions`,
-              `Collaborating on advanced ${goalText} research projects`,
-              `Transitioning from ${goalText} expert to innovator`,
-              `Latest patents and innovations in ${goalText}`,
-              `Exploring ethical dilemmas in advanced ${goalText} usage`,
-              `Advanced integrations of ${goalText} with AI/ML`,
-              `Cutting-edge ${goalText} techniques in 2025 and beyond`,
-            ];
-            prompt = proPrompts[Math.floor(Math.random() * proPrompts.length)];
-          }
-
-          // Add new goal data
-          goals.push({
-            text: goalText,
-            value: rangeValue,
-            date: currentDate,
-            prompt: prompt,
-          });
-
-          // Save the updated array back to Chrome Storage
-          chrome.storage.sync.set({ goals: goals }, function () {
-            console.log("Goals saved:", goals);
-          });
-        });
-      } else {
-        alert("Please enter a valid goal (no special characters allowed).");
-      }
+      getEnteredInputInformation(goalText, rangeValue);
     } else {
       alert("Please enter a goal.");
     }

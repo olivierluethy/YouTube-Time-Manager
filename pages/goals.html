@@ -10,14 +10,12 @@
   <body>
     <header>
       <h1>Define your goals</h1>
-      <h3>
-        Enter the skill you want to learn here. Your information will be sent to
-        the YouTube API and the videos will appear in the YouTube feed.
-      </h3>
+      <h3>Enter your goals and we'll customize your feed.</h3>
     </header>
     <div class="inputExamples">
       <h2>Input Examples</h2>
       <!-- First row -->
+       <!-- Die Rows könnte man mittels JavaScript automatisieren, aber zuerst soll mal der bug im CSS gefunden werden welcher das bild so verzerrt darstellen lässt -->
       <div class="stock-ticker">
         <ul>
           <p class="quote">
@@ -225,7 +223,11 @@
       <label for="goalInput" class="goal-label" style="text-align: center"
         >What would you like to learn?</label
       >
-      <input type="text" id="goalInput" placeholder="Enter your goal here..." />
+      <input
+        type="text"
+        id="goalInput"
+        placeholder="Enter your goal here..."
+      /><button id="subGoal" title="Click to add Goal">+ Add</button>
       <div class="range-container">
         <label for="text" class="range-label"
           >How familiar are you already with it?</label
