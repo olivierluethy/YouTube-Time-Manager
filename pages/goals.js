@@ -1,13 +1,142 @@
 var input = document.getElementById("goalInput");
 var goalsList = document.getElementById("goals");
 var goalsTable = document.getElementById("goalsTable");
+const searchInput = document.getElementById("searchGoals");
 
 const rangeInput = document.querySelector(".goal-range");
 const valueDisplay = document.querySelector(".range-value");
 
+updateSearchVisibility();
+toggleTableVisibility();
+
 rangeInput.addEventListener("input", () => {
   valueDisplay.textContent = rangeInput.value;
 });
+
+// https://chatgpt.com/c/678c16b6-fa5c-8008-8c15-a1896c50767e
+// Funktion, um die Inhalte dynamisch zu erstellen
+function createStockTickerContent() {
+  const stockTicker = document.querySelector(".stock-ticker");
+  if (!stockTicker) {
+    console.error('Element mit der Klasse "stock-ticker" nicht gefunden.');
+    return;
+  }
+
+  // Liste der Inhalte
+  const quotes = [
+    "C#",
+    "Dancing",
+    "Video Editing",
+    "Fusion 360",
+    "Cooking",
+    "Drone Building",
+    "Climbing",
+    "Photoshop",
+    "Photography",
+    "Baking",
+    "Painting",
+    "Drawing",
+    "Guitar",
+    "Woodworking",
+    "Gardening",
+    "Writing",
+    "Reading",
+    "Chess",
+    "Algebra",
+  ];
+
+  // Beide Listen erzeugen
+  for (let i = 0; i < 2; i++) {
+    const ul = document.createElement("ul");
+    if (i === 1) {
+      ul.setAttribute("aria-hidden", "true");
+      ul.style.marginLeft = "-2.5rem";
+    }
+
+    // Paragraphen mit Buttons hinzufügen
+    quotes.forEach((quote) => {
+      const p = document.createElement("p");
+      p.className = "quote";
+
+      const textNode = document.createTextNode(quote);
+      p.appendChild(textNode);
+
+      const button = document.createElement("button");
+      button.className = "quote-button";
+      button.title = `Use ${quote}`;
+      button.textContent = "Use";
+      p.appendChild(button);
+
+      ul.appendChild(p);
+    });
+
+    stockTicker.appendChild(ul);
+  }
+}
+
+// Funktion aufrufen
+createStockTickerContent();
+
+// Funktion, um die Inhalte für die Klasse stock-flicker dynamisch zu erstellen
+function createStockFlickerContent() {
+  const stockFlicker = document.querySelector(".stock-flicker");
+  if (!stockFlicker) {
+    console.error('Element mit der Klasse "stock-flicker" nicht gefunden.');
+    return;
+  }
+
+  // Liste der Inhalte
+  const quotes = [
+    "Yoga",
+    "3D Printing",
+    "Calligraphy",
+    "Sculpting",
+    "Singing",
+    "Piano",
+    "Traveling",
+    "Fishing",
+    "Swimming",
+    "Puzzles",
+    "Bird Watching",
+    "DIY Projects",
+    "Martial Arts",
+    "German",
+    "Origami",
+    "Astronomy",
+    "Cake Decorating",
+  ];
+
+  // Beide Listen erzeugen
+  for (let i = 0; i < 2; i++) {
+    const ul = document.createElement("ul");
+    if (i === 1) {
+      ul.setAttribute("aria-hidden", "true");
+      ul.style.marginLeft = "-2.5rem";
+    }
+
+    // Paragraphen mit Buttons hinzufügen
+    quotes.forEach((quote) => {
+      const p = document.createElement("p");
+      p.className = "quote";
+
+      const textNode = document.createTextNode(quote);
+      p.appendChild(textNode);
+
+      const button = document.createElement("button");
+      button.className = "quote-button";
+      button.title = `Use ${quote}`;
+      button.textContent = "Use";
+      p.appendChild(button);
+
+      ul.appendChild(p);
+    });
+
+    stockFlicker.appendChild(ul);
+  }
+}
+
+// Funktion aufrufen
+createStockFlickerContent();
 
 // Load saved goals when the page loads
 chrome.storage.sync.get("goals", function (data) {
@@ -17,7 +146,66 @@ chrome.storage.sync.get("goals", function (data) {
     });
   }
 });
+// https://chatgpt.com/c/678c0b51-ce00-8008-96f8-7e69fb1a2983
+function levenshteinDistance(a, b) {
+  const matrix = [];
 
+  // Initialisiere die Matrix
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  // Fülle die Matrix
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
+function filterGoals() {
+  const filter = searchInput.value.toLowerCase().trim(); // Leerzeichen entfernen
+  const rows = Array.from(goalsList.getElementsByTagName("tr"));
+
+  if (!filter) {
+    // Keine Eingabe: Originalreihenfolge beibehalten
+    rows.forEach((row) => (row.style.display = ""));
+    return;
+  }
+
+  // Ziele mit Distanz berechnen
+  const scoredRows = rows.map((row) => {
+    const goalCell = row.getElementsByTagName("td")[0];
+    if (!goalCell) return { row, distance: Infinity };
+
+    const goalText = goalCell.textContent.toLowerCase();
+    const distance = levenshteinDistance(goalText, filter);
+    return { row, distance };
+  });
+
+  // Sortieren nach Distanz
+  scoredRows.sort((a, b) => a.distance - b.distance);
+
+  // Neu sortierte Reihenfolge anwenden
+  scoredRows.forEach(({ row }) => {
+    goalsList.appendChild(row);
+    row.style.display = ""; // Alle anzeigen
+  });
+}
+
+// Beispiel für das Hinzufügen von Zielen
 function addGoalToList(goalText, rangeValue, date) {
   var row = document.createElement("tr");
   row.className = "goal-item";
@@ -28,7 +216,7 @@ function addGoalToList(goalText, rangeValue, date) {
   var valueCell = document.createElement("td");
   valueCell.textContent = rangeValue;
 
-  var dateCell = document.createElement("td"); // New cell for the date
+  var dateCell = document.createElement("td");
   dateCell.textContent = date;
 
   var actionCell = document.createElement("td");
@@ -42,9 +230,9 @@ function addGoalToList(goalText, rangeValue, date) {
   };
 
   var editButton = document.createElement("button");
-  editButton.textContent = "Edit"; // Set the button text
-  editButton.className = "edit-goal"; // Set the class name
-  editButton.title = "Edit Goal"; // Set the title
+  editButton.textContent = "Edit";
+  editButton.className = "edit-goal";
+  editButton.title = "Edit Goal";
   editButton.onclick = function () {
     editGoal(row);
   };
@@ -53,13 +241,14 @@ function addGoalToList(goalText, rangeValue, date) {
   actionCell.appendChild(removeButton);
   row.appendChild(goalCell);
   row.appendChild(valueCell);
-  row.appendChild(dateCell); // Append the date cell
+  row.appendChild(dateCell);
   row.appendChild(actionCell);
   goalsList.appendChild(row);
 
-  // Check if the table should be displayed
+  // Überprüfen, ob die Tabelle angezeigt werden soll
   toggleTableVisibility();
 }
+searchInput.addEventListener("input", filterGoals);
 
 // Um für jedes Ziel eine Identifikation anhand von einer ID hinzufügt. Diese ID wird nur für die Erstellung eines Zieles genutzt und das nur einmal pro Ziel.
 async function generateUniqueID(goal) {
@@ -272,6 +461,7 @@ document.getElementById("subGoal").addEventListener("click", function () {
   getEnteredInputInformation(goalText, rangeValue);
 });
 
+/* https://www.blackbox.ai/share/752a1e5a-a065-4258-bc04-ba89b1eb6ef5 */
 async function getEnteredInputInformation(goalText, rangeValue) {
   // Regular expression to check for special characters
   var isValidInput = /^[a-zA-Z0-9\s#\-_äöüÄÖÜ]*$/.test(goalText);
@@ -309,11 +499,35 @@ async function getEnteredInputInformation(goalText, rangeValue) {
       // Save the updated array back to Chrome Storage
       chrome.storage.sync.set({ goals: goals }, function () {
         console.log("Goals saved:", goals);
+        updateSearchVisibility(); // Sichtbarkeit des Suchfelds aktualisieren
       });
     });
   } else {
     alert("Please enter a valid goal (no special characters allowed).");
   }
+}
+
+function updateSearchVisibility() {
+  // Überprüfe die Anzahl der Ziele im Chrome Storage
+  chrome.storage.sync.get("goals", function (data) {
+    var goals = data.goals || [];
+    if (goals.length == 0) {
+      document.querySelector(".enter").style.marginTop = "-1rem";
+    }
+    if (goals.length == 1) {
+      document.querySelector(".enter").style.marginTop = "1rem";
+    }
+    // Suchfeld wird angezeigt
+    if (goals.length >= 4) {
+      searchInput.style.display = "block";
+      document.querySelector(".table-container").style.marginTop = "2rem";
+    } 
+    // Suchfeld wird ausgeblendet
+    else if (goals.length < 4 && goals.length > 1) {
+      searchInput.style.display = "none";
+      document.querySelector(".table-container").style.marginTop = "0rem";
+    }
+  });
 }
 
 // Event Listener for the input
@@ -346,14 +560,13 @@ function removeGoal(goalText, row) {
     // Save the updated array back to Chrome Storage
     chrome.storage.sync.set({ goals: goals }, function () {
       console.log("Updated goals after removal:", goals);
+      updateSearchVisibility(); // Sichtbarkeit des Suchfelds aktualisieren
     });
   });
 
   // Check if the table should be displayed
   toggleTableVisibility();
 }
-
-toggleTableVisibility();
 
 // Function to toggle the visibility of the table
 function toggleTableVisibility() {

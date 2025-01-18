@@ -1,6 +1,8 @@
 <!-- PROJECT LOGO -->
-[link-chrome]: https://chromewebstore.google.com/detail/youtube-disblock/ikhkekdjdjpklbpmgloalpapjgfolheh "Chrome Web Store"
-[link-firefox]: https://addons.mozilla.org/en-US/firefox/addon/youtube-disblock "Firefox Addons"
+
+[link-chrome]: https://chromewebstore.google.com/detail/youtube-time-manager/ikhkekdjdjpklbpmgloalpapjgfolheh "Chrome Web Store"
+[link-firefox]: https://addons.mozilla.org/en-US/firefox/addon/youtube-time-manager "Firefox Addons"
+
 <br />
 <p align="center">
   <a href="github.com/Olivier_Luethy/TackPad.git">
@@ -8,7 +10,7 @@
   </a>
 
   <h3 align="center">YouTube Time Manager</h3>
-  <h4 align="center">Google Chrome extension to block YouTube video recommendations without affecting the visibility of open playlists</h4>
+  <h4 align="center">Google Chrome extension to block YouTube's distractive feature - Decide what you want to see</h4>
 
   <p align="center">
     Here I'll explain how I developed the application called YouTube Time Manager
@@ -49,30 +51,66 @@
   </ol>
 </details>
 
-YouTube-Disblock is a simple yet effective Chrome extension that improves your focus by hiding YouTube recommendations, other users' playlists, and the tab list while you're watching videos. This ensures that you're not distracted by unrelated content and can focus on what's important.
+YouTube Time Manager is a simple yet effective Chrome extension that improves your focus by hiding YouTube recommendations, other users' playlists, and the tab list while you're watching videos. This ensures that you're not distracted by unrelated content and can focus on what's important.
 
-## Features
+---
 
-- 🏠 **Remove YouTube Feeds on the Home Page**  
-  Clear out unnecessary content on your YouTube homepage by removing constant updates and recommendations. Maintain a clean and distraction-free environment for better focus.<br>
-- 🔥 **Remove the Discovery Section**  
-  Trending content can easily pull you away from your goals. YouTube-Disblock removes the discovery section, allowing you to avoid distractions and stay focused on what matters.<br>
-- 🔔 **Control Subscriptions Visibility**  
-  Decide whether or not to display videos from channels you’ve subscribed to. Use the toggle within the extension’s popup window to switch visibility on or off, with clear text indicating what’s changed.<br>
-- 🛡️ **Smart Blocking for Trending Bypass Attempts**  
-  For users who might be tempted to visit the trending section manually, YouTube-Disblock steps in. If you try to access the trending section via the URL, the extension smartly redirects you to your subscriptions, ensuring a focused experience.<br>
-- 🎥 **Keep Playlists Visible While Hiding Recommendations**  
-  Unlike other extensions that block recommendations and hide playlists, YouTube-Disblock maintains playlist visibility so you can easily switch between videos within your playlist while keeping distracting video suggestions out of sight.
+### ✨ **Key Features** ✨  
+
+- 🎯 **Goal-Driven Feed Customization**  
+  Define your goals, and YouTube Time Manager will tailor your feed accordingly, ensuring that you only see videos that match your objectives.
+
+- 🏠 **Declutter Your Home Page**  
+  Remove the noise from your YouTube homepage by clearing out recommendations and updates. Enjoy a clean, distraction-free interface that promotes focus.
+
+- 🔍 **Eliminate the Discovery Section**  
+  Avoid distractions from trending content. YouTube Time Manager removes the discovery section, keeping your focus on what truly matters.
+
+- 🔔 **Flexible Subscription Controls**  
+  Choose whether to display videos from your subscriptions. With an easy toggle in the extension’s popup, you decide what’s visible.
+
+- 🛡️ **Smart Redirect for Manual Bypasses**  
+  Trying to access the trending section via URL? YouTube Time Manager will redirect you to your subscriptions, keeping your experience distraction-free.
+
+- 🎥 **Playlist Visibility with Recommendation Blocking**  
+  Unlike other extensions, YouTube Time Manager allows playlist navigation while hiding unrelated video suggestions. This ensures uninterrupted learning or entertainment.
+
+- ⏳ **Overconsumption Timeout**  
+  Watch five videos that don’t align with your goals, and YouTube access will be blocked for 10 minutes. During this period, you’ll receive insights about time wasted, helping you make better decisions for the future.
+
+---
+
+
+### 🌟 **Why Choose YouTube Time Manager?** 🌟  
+
+YouTube Time Manager is crafted for individuals seeking a productive YouTube experience. Unlike similar extensions, it blocks distractions effectively without introducing toggles that could undo the effort. Designed through practical experience, this extension empowers you to stay on track and use your time wisely.  
+
+---
+
+### 🤝 **Support & Feedback** 🤝  
+
+Your input matters! Encountering issues or have suggestions? Let’s improve together:  
+📧 **Contact Us:** muskox.beryl2671@eagereverest.com  
+
+---
+
+### 🛠 **Note:**  🛠
+
+YouTube Time Manager is ideal for users committed to enhancing their productivity. By minimizing distractions and promoting goal-oriented content consumption, this extension ensures you make the most out of your YouTube time.  
+
+---  
+
+### 👇 **Official download links** 👇
 
 <div align="center">
 
 [<img src="https://user-images.githubusercontent.com/574142/232173820-eea32262-2b0f-4ec6-8a38-b1c872981d75.png" height="67" alt="Chrome" valign="middle">][link-chrome]
 [<img src="https://user-images.githubusercontent.com/574142/232173822-af2e660f-11df-4d6c-a71b-0e92e9be543f.png" height="67" alt="Firefox" valign="middle">][link-firefox]
+We are planing to add the extension also to the firefox, so even mobile users who have firefox installed will be able to use it from their phone.
 
 </div>
 
-
-## How It Works
+## ? **How It Works** ?
 
 ### Background Process
 
@@ -118,7 +156,7 @@ The content script (`popup.js`) handles all the DOM for the popup:
 2. Use the toggle switch to enable or disable the hiding of YouTube subscription videos.
 3. The state of the extension (enabled or disabled) will be remembered for future browsing sessions.
 
-## Nice to have
+## Feature request
 
 Originally I had planned to add a slider to the extension so you could turn it on and off as needed. But if you decide to download the extension and want to solve the problem it solves, why would you want to disable it? Why should you download this extension in the first place? For one thing, it would be technically nice to have the design, but it's also unnecessary. If someone else wants to add something, go ahead. Create a bug and I will be informed and can add the feature if it really makes sense.
 
@@ -130,6 +168,18 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - **Olivier Lüthy** - _Developer and Maintainer_
 
+## Name change history
+
+- YouRecoHide (First Name)
+- YouTube-Disblock (Second name lasted till 20. December 2024)
+- YouTube Time Manager (Lasted till then)
+
+## Links
+Links that I've used to accomplish this extension:
+- https://codepen.io/optimisticweb/pen/oNOBwBq<br>
+- https://www.w3schools.com/howto/howto_css_modals.asp<br>
+- https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only
+
 ## Acknowledgements
 
 - Special thanks to the Chrome Extensions documentation and various online resources for guidance in developing this extension.
@@ -137,4 +187,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Disclaimer
 
 I don't store any of your information. If you don't believe me, all the code is in this repo so you can check it out for yourself. The only data that is stored is on your own computer. This is necessary for Chrome to remember what you chose to hide when you refresh your page.
-YouTube-Disblock for YouTube is not affiliated with YouTube.
+YouTube Time Manager for YouTube is not affiliated with YouTube.

@@ -2,18 +2,24 @@ body {
   padding: 0;
   margin: 0;
   font-family: system-ui, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #131722;
-  background-color: black;
-
   background-image: url(../icon/logoGray.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
-  min-height: 100vh;
   overflow-y: hidden;
+}
+header {
+  background-color: white;
+  color: black;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  box-shadow: 0 4px 2px -2px gray;
+  text-align: center;
+  font-size: 1rem;
+}
+header h1 {
+  text-align: center;
 }
 #goalInput[type="text"] {
   width: 50%;
@@ -34,25 +40,7 @@ body {
   outline: none;
   border-radius: 20px;
 }
-header {
-  background-color: white;
-  color: black;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  width: 100%;
-  /* https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only */
-  box-shadow: 0 4px 2px -2px gray;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-header h1 {
-  font-size: 3rem;
-  text-align: center;
-}
-h2 {
-  text-align: center;
-  color: white;
-}
+
 /* First row*/
 .stock-ticker {
   height: 10vh;
@@ -158,14 +146,14 @@ h2 {
 .quote:hover .lower-half {
   transform: translateX(-100%);
 }
-/* https://chatgpt.com/c/67883478-52d4-8008-bfdd-18dea34bb90c */
+/* https://chatgpt.com/share/67883699-86e4-8008-84b5-814e6453c82c */
 .quote-button {
   opacity: 0; /* Button initially hidden */
   position: absolute;
   bottom: 5px;
   left: 50%;
   transform: translateX(-50%) translateY(10px); /* Slightly move down initially */
-  padding: 8px 18px;
+  padding: 4px 10px;
   font-size: 1rem;
   background-color: #007acc;
   color: white;
@@ -176,15 +164,22 @@ h2 {
   pointer-events: none; /* Disable interaction when hidden */
 }
 
+.quote-button:hover {
+  background-color: black;
+}
+
 .quote:hover .quote-button {
   opacity: 1; /* Fully visible on hover */
   transform: translateX(-50%) translateY(0); /* Move to original position */
   pointer-events: auto; /* Enable interaction */
 }
 
+.inputExamples {
+  text-align: center;
+}
 /* Second row */
 .stock-flicker {
-  height: 15vh;
+  height: 10vh;
   margin-top: -2rem;
   font-size: 15px;
   padding-block: 8px;
@@ -475,8 +470,23 @@ tbody tr:hover {
   background-color: #f1f1f1; /* Highlight row on hover */
 }
 
-.table-container {
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 2rem;
+  margin-bottom: -1rem;
+}
+
+#searchGoals {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  display: none;
+}
+
+.table-container {
   width: 50%;
   max-height: 300px; /* Set a maximum height for the table */
   overflow-y: auto; /* Enable vertical scrolling */

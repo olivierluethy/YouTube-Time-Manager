@@ -1,4 +1,6 @@
 // https://chatgpt.com/share/6786bd5d-087c-8008-be48-4893fe8212f9
+// https://chatgpt.com/share/678c3477-ddc4-8008-8a41-781e677f14a4
+// https://www.blackbox.ai/share/8cb80e46-da79-4e87-8b10-5ebbc7ed74b4
 function searchVideos(goals) {
   if (!goals || goals.length === 0) {
     console.log("Keine Ziele angegeben. Beende die Funktion.");
@@ -97,7 +99,6 @@ function searchVideos(goals) {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-
 // Function to display videos grouped by goal
 function displayVideos(goalVideos) {
   // Suche das HTML-Element mit der ID "primary", in dem die Videos angezeigt werden sollen.
@@ -123,11 +124,8 @@ function displayVideos(goalVideos) {
 
   // Erstelle für jedes Ziel (Thema) einen Button.
   for (const [goalKey, videos] of Object.entries(goalVideos)) {
-    // Hole den Namen des Ziels, falls es als Objekt gespeichert ist.
-    const goalName =
-      typeof goalKey === "object"
-        ? goalKey.text || "Unbekanntes Ziel"
-        : goalKey;
+    // Hole den Namen des Ziels aus storedGoals
+    const goalName = storedGoals[goalKey].text || "Unbekanntes Ziel"; // Hier den Namen des Ziels verwenden
 
     // Erstelle einen neuen Button für das Ziel.
     const goalButton = document.createElement("button");

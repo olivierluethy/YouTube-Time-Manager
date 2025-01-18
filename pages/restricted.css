@@ -66,3 +66,31 @@ td {
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
+
+h1 {
+  text-align: center;
+  margin-top: 2rem;
+  color: white;
+}
+h2 {
+  text-align: center;
+  color: white;
+  margin: 1rem 0;
+}
+#prediction {
+  text-align: center;
+  font-size: 1.5em;
+  border: 2px solid white;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  max-width: 600px;
+}
+#congrats {
+  text-align: center;
+  color: #4CAF50;
+  margin: 1rem 0;
+  font-weight: normal;
+}
