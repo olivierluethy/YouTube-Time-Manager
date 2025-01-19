@@ -2,47 +2,45 @@ body {
   padding: 0;
   margin: 0;
   font-family: system-ui, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #131722;
-  background-color: black;
+  background-image: url(../icon/logoGray.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-y: hidden;
 }
-input[type="text"] {
+header {
+  background-color: white;
+  color: black;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  box-shadow: 0 4px 2px -2px gray;
+  text-align: center;
+  font-size: 1rem;
+}
+header h1 {
+  text-align: center;
+}
+#goalInput[type="text"] {
   width: 50%;
-  padding: 4px 20px;
+  padding: 10px;
   margin-left: 25%;
   font-size: 1.5rem;
   text-align: center;
-  border: 2px solid transparent;
+  border: 1px solid black;
+  border-radius: 4px;
+  margin-bottom: 20px;
   box-sizing: border-box;
   box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   transition-duration: 0.5s;
 }
-input[type="text"]:focus {
+#goalInput[type="text"]:focus {
   outline: none;
   border-radius: 20px;
 }
-header {
-  background-color: white;
-  color: black;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  width: 100%;
-  /* https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only */
-  box-shadow: 0 4px 2px -2px gray;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-header h1 {
-  font-size: 3rem;
-  text-align: center;
-}
-h2 {
-  text-align: center;
-  color: white;
-}
+
 /* First row*/
 .stock-ticker {
   height: 10vh;
@@ -94,8 +92,6 @@ h2 {
   padding: 8px 12px;
   background-color: #fafafa;
   box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
-  -webkit-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
-  -moz-box-shadow: 1px -1px 18px 1px rgba(255, 255, 255, 0.75);
   overflow: hidden;
   cursor: pointer;
 }
@@ -150,9 +146,40 @@ h2 {
 .quote:hover .lower-half {
   transform: translateX(-100%);
 }
+/* https://chatgpt.com/share/67883699-86e4-8008-84b5-814e6453c82c */
+.quote-button {
+  opacity: 0; /* Button initially hidden */
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px); /* Slightly move down initially */
+  padding: 4px 10px;
+  font-size: 1rem;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.5s ease; /* Smooth animation */
+  pointer-events: none; /* Disable interaction when hidden */
+}
+
+.quote-button:hover {
+  background-color: black;
+}
+
+.quote:hover .quote-button {
+  opacity: 1; /* Fully visible on hover */
+  transform: translateX(-50%) translateY(0); /* Move to original position */
+  pointer-events: auto; /* Enable interaction */
+}
+
+.inputExamples {
+  text-align: center;
+}
 /* Second row */
 .stock-flicker {
-  height: 15vh;
+  height: 10vh;
   margin-top: -2rem;
   font-size: 15px;
   padding-block: 8px;
@@ -185,17 +212,6 @@ h2 {
     transform: translateX(0);
   }
 }
-
-/* Falsch
-@keyframes scroll {
-  from {
-    transform: translateX(calc(100% + var(--gap)));
-  }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-  }
-} 
-*/
 
 .quote {
   position: relative;
@@ -275,39 +291,78 @@ h2 {
   text-align: center;
   font-size: 20px;
 }
-span.remove-goal {
+.remove-goal {
   display: inline-block;
-  margin-left: 1rem;
-  color: red;
+  background-color: red;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  margin-left: 2rem;
   transition: all 0.5s ease;
 }
 .remove-goal:hover {
   cursor: pointer;
+  box-shadow: black 0px 0px 15px 0px;
   transform: scale(1.5);
 }
+.edit-goal {
+  display: inline-block;
+  background-color: darkorange;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+.edit-goal:hover {
+  cursor: pointer;
+  box-shadow: black 0px 0px 15px 0px;
+  transform: scale(1.1);
+}
 .enter {
-  background-color: darkgray; /* Light gray for better contrast */
+  background-color: white; /* Light gray for better contrast */
   padding: 20px; /* Add padding for better spacing */
   border-radius: 8px; /* Rounded corners */
-  box-shadow: rgba(255, 255, 255, 0.2) 0px 7px 29px 0px;
+  box-shadow: 0px 0px 15px 0px white;
+  -webkit-box-shadow: 0px 0px 15px 0px white;
+  -moz-box-shadow: 0px 0px 15px 0px white;
   width: 50%;
-  /* margin-top: -2rem; */
   margin-left: auto;
   margin-right: auto;
+}
+
+.enter button {
+  background-color: #04aa6d; /* Green */
+  border: 2px solid #04aa6d;
+  color: white;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: none;
+  font-size: 16px;
+  margin-left: 1rem;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.enter button:hover {
+  background-color: white;
+  color: black;
 }
 
 .goal-label {
   font-size: 1.2rem; /* Larger font for the label */
   margin-bottom: 10px; /* Space between label and input */
   display: block; /* Make label a block element */
-}
-
-.goal-input {
-  width: 80%; /* Set width for input */
-  padding: 10px; /* Add padding for comfort */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px; /* Rounded corners */
-  margin-bottom: 20px; /* Space below input */
 }
 
 .range-container {
@@ -415,8 +470,23 @@ tbody tr:hover {
   background-color: #f1f1f1; /* Highlight row on hover */
 }
 
-.table-container {
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 2rem;
+  margin-bottom: -1rem;
+}
+
+#searchGoals {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  display: none;
+}
+
+.table-container {
   width: 50%;
   max-height: 300px; /* Set a maximum height for the table */
   overflow-y: auto; /* Enable vertical scrolling */
@@ -426,4 +496,160 @@ tbody tr:hover {
   box-shadow: 0px 0px 15px 0px white;
   -webkit-box-shadow: 0px 0px 15px 0px white;
   -moz-box-shadow: 0px 0px 15px 0px white;
+}
+/* https://chatgpt.com/share/678d303f-f3d0-8008-b60d-744f64b90311 */
+/* The Modal (background) */
+dialog {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: 100px;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 1;
+  transition: opacity 2s ease-in, background-color 2s ease-in;
+}
+
+dialog .modal-content {
+  position: relative;
+  background-color: #ffffff;
+  margin: auto;
+  padding: 30px;
+  border: none;
+  width: 40%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+dialog .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+dialog .modal-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+dialog .modal-header .close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+dialog .modal-header .close:hover,
+dialog .modal-header .close:focus {
+  color: #000;
+}
+
+dialog .modal-body {
+  padding: 20px 0;
+}
+
+dialog .modal-body label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+dialog .modal-body input[type="text"],
+dialog .modal-body input[type="range"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+dialog .modal-body input[type="range"] {
+  -webkit-appearance: none;
+  height: 5px;
+  background: #ddd;
+  border-radius: 5px;
+}
+
+dialog .modal-body input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #5cb85c;
+  cursor: pointer;
+}
+
+dialog .range-valueEdit {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+dialog .modal-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+dialog .modal-footer .btn,
+dialog .modal-footer .closeBtn {
+  background-color: #5cb85c;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+dialog .modal-footer .btn:hover,
+dialog .modal-footer .closeBtn:hover {
+  background-color: #4cae4c;
+}
+
+/* Animation für das Öffnen */
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 50px;
+    opacity: 1;
+  }
+}
+
+/* Animation für das Schließen mit Hüpfen */
+@keyframes animatebottom {
+  0% {
+    top: 50px;
+    opacity: 1;
+  }
+  50% {
+    top: 30px; /* Leichter Sprung nach oben */
+    opacity: 1;
+  }
+  100% {
+    top: -300px;
+    opacity: 0;
+  }
+}
+
+/* Wenn der Dialog geöffnet ist */
+dialog[open] {
+  animation: animatetop 0.5s forwards ease-in-out; /* Animation fürs Öffnen */
+}
+
+/* Animation nur bei Schließen */
+dialog.closing {
+  animation: animatebottom 0.5s forwards ease-in-out; /* Animation fürs Schließen */
 }

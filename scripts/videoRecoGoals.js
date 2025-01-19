@@ -1,163 +1,167 @@
+// https://chatgpt.com/share/6786bd5d-087c-8008-be48-4893fe8212f9
+// https://chatgpt.com/share/678d111d-5568-8008-88e9-f9cde3c1df2f
 function searchVideos(goals) {
   if (!goals || goals.length === 0) {
-    console.log("No goals provided. Exiting the function.");
+    console.log("Keine Ziele angegeben. Beende die Funktion.");
     return;
   }
 
-  // Create a MutationObserver to watch for changes to the body
-  const observer = new MutationObserver((mutations) => {
+  const observer = new MutationObserver(() => {
     const primaryElement = document.getElementById("primary");
 
     if (primaryElement) {
-      // Stop observing after the primary element is found
       observer.disconnect();
 
-      // Proceed with fetching goals and videos
       chrome.storage.sync.get(["doubleGoals", "videoData"], (res) => {
         const storedGoals = res.doubleGoals || {};
         const storedVideos = res.videoData || {};
+        const goalVideos = { ...storedVideos };
 
-        const goalVideos = { ...storedVideos }; // Initialize goalVideos with stored data
+        // Filtere Ziele mit Änderungen
+        const changedGoals = goals.filter((goal) => {
+          const storedGoal = storedGoals[goal.id];
 
-        // Convert the goals array into an object for easier comparison
-        const goalsObject = {};
-        goals.forEach((goal) => (goalsObject[goal] = true));
+          return (
+            !storedGoal || // Neues Ziel
+            storedGoal.prompt !== goal.prompt || // Geänderter Prompt
+            storedGoal.text !== goal.text // Geänderter Text
+          );
+        });
 
-        // Check if storedGoals have changed
-        const goalsToAdd = goals.filter((goal) => !storedGoals[goal]);
-        const goalsToRemove = Object.keys(storedGoals).filter(
-          (storedGoal) => !goalsObject[storedGoal]
+        // Entferne gespeicherte Ziele, die nicht mehr in der aktuellen Liste enthalten sind.
+        const removedGoalIds = Object.keys(storedGoals).filter(
+          (id) => !goals.some((goal) => goal.id === id)
         );
 
-        // Check if all goals are already stored
-        if (goalsToAdd.length === 0 && goalsToRemove.length === 0) {
-          console.log(
-            "All goals are already stored. No API call will be made."
-          );
-          displayVideos(goalVideos);
-          return; // Exit if no changes
-        }
+        removedGoalIds.forEach((id) => {
+          delete storedGoals[id];
+          delete goalVideos[id];
+        });
 
-        // Handle added goals by fetching video data
-        if (goalsToAdd.length > 0) {
-          console.log("Goals to add:", goalsToAdd);
-
-          // Fetch videos for each new goal and add to goalVideos
-          Promise.all(
-            goalsToAdd.map((goal) => {
-              const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
-              const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-                goal
-              )}&type=video&key=${apiKey}`;
-
-              return fetch(url)
-                .then((response) => response.json())
-                .then((data) => {
-                  const shortsRegex = /#?short/i; // Regular expression to match "short", "shorts", "#short", "#shorts" etc.
-
-                  const videos = data.items
-                    .map((item) => ({
-                      videoId: item.id.videoId,
-                      title: item.snippet.title,
-                      url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-                      description: item.snippet.description,
-                      thumbnail: item.snippet.thumbnails.medium.url,
-                    }))
-                    .filter((video) => {
-                      // Check if title or description contains the regex pattern
-                      return (
-                        !shortsRegex.test(video.title) &&
-                        !shortsRegex.test(video.description)
-                      );
-                    });
-
-                  goalVideos[goal] = videos; // Store videos for the goal
-                  storedGoals[goal] = true; // Mark goal as stored
-                });
-            })
-          )
-            .then(() => {
-              // Save updated videos and goals to storage
-              chrome.storage.sync.set(
-                { doubleGoals: storedGoals, videoData: goalVideos },
-                () => {
-                  console.log(
-                    "Updated stored goals and videos:",
-                    storedGoals,
-                    goalVideos
-                  );
-                  displayVideos(goalVideos);
-                }
-              );
-            })
-            .catch((error) => {
-              console.error("Error fetching videos:", error);
-            });
-        }
-
-        // Handle removed goals by deleting from goal Videos
-        if (goalsToRemove.length > 0) {
-          console.log("Goals to remove:", goalsToRemove);
-          goalsToRemove.forEach((goal) => {
-            delete goalVideos[goal];
-            delete storedGoals[goal]; // Also remove from storedGoals
-          });
-
-          // Update the storage with the new goals
+        if (removedGoalIds.length > 0) {
+          console.log("Veraltete Ziele entfernt:", removedGoalIds);
           chrome.storage.sync.set(
             { doubleGoals: storedGoals, videoData: goalVideos },
-            () => {
-              console.log("Updated stored goals after removal:", storedGoals);
-              displayVideos(goalVideos);
-            }
+            () => console.log("Gespeicherte Ziele und Videos aktualisiert.")
           );
-        } else {
-          // If no goals are removed, just display the videos
-          displayVideos(goalVideos);
         }
+
+        if (changedGoals.length === 0) {
+          console.log(
+            "Keine Änderungen festgestellt. Kein API-Call erforderlich."
+          );
+          displayVideos(goalVideos, storedGoals);
+
+          return;
+        }
+
+        // API-Aufrufe für geänderte Ziele
+        Promise.all(
+          changedGoals.map((goal) => {
+            const prompt = goal.prompt || goal.text;
+
+            console.log("Der Text für die API-Anfrage lautet: " + prompt);
+
+            const apiKey = "AIzaSyBYmLMpFyEjHVEvVhob4ncb9QYAse32kJo";
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+              prompt
+            )}&type=video&key=${apiKey}`;
+
+            return fetch(url)
+              .then((response) => response.json())
+              .then((data) => {
+                const shortsRegex = /#?short/i;
+                const videos = data.items
+                  .map((item) => ({
+                    videoId: item.id.videoId,
+                    title: item.snippet.title,
+                    url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+                    description: item.snippet.description,
+                    thumbnail: item.snippet.thumbnails.medium.url,
+                  }))
+                  .filter(
+                    (video) =>
+                      !shortsRegex.test(video.title) &&
+                      !shortsRegex.test(video.description)
+                  );
+
+                // Aktualisiere die Videos und den Speicher
+                goalVideos[goal.id] = videos; // Verwende den ID-Hash als Schlüssel
+                storedGoals[goal.id] = {
+                  hash: goal.id, // Der Hash entspricht der ID
+                  prompt: goal.prompt || goal.text,
+                  text: goal.text,
+                };
+              });
+          })
+        )
+          .then(() => {
+            chrome.storage.sync.set(
+              { doubleGoals: storedGoals, videoData: goalVideos },
+              () => {
+                console.log(
+                  "Gespeicherte Ziele und Videos aktualisiert:",
+                  goalVideos
+                );
+                displayVideos(goalVideos, storedGoals);
+              }
+            );
+          })
+          .catch((error) =>
+            console.error("Fehler beim Abrufen der Videos:", error)
+          );
       });
     }
   });
 
-  // Start observing the entire document for added nodes
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
 // Function to display videos grouped by goal
-function displayVideos(goalVideos) {
+function displayVideos(goalVideos, storedGoals) {
   const primaryElement = document.getElementById("primary");
-  primaryElement.innerHTML = ""; // Clear existing content
+  primaryElement.innerHTML = "";
 
-  // Add button container at the top
   const buttonContainer = document.createElement("div");
   buttonContainer.className = "goal-buttons";
+
   buttonContainer.style.display = "flex";
   buttonContainer.style.gap = "8px";
   buttonContainer.style.marginBottom = "1rem";
   buttonContainer.style.padding = "1rem";
   buttonContainer.style.position = "fixed";
   buttonContainer.style.width = "100%";
-  buttonContainer.style.top = "50"; // This keeps it at the top of the viewport
-  buttonContainer.style.backgroundColor = "#0f0f0f"; // Optional: Set a background color
-  buttonContainer.style.zIndex = "1000"; // Optional: Ensure it stays on top of other elements
+  buttonContainer.style.top = "50px";
+  buttonContainer.style.backgroundColor = "#0f0f0f";
+  buttonContainer.style.zIndex = "1000";
 
-  // Create buttons for each goal
-  for (const goalName of Object.keys(goalVideos)) {
+  for (const [goalKey, videos] of Object.entries(goalVideos)) {
+    const goalName = storedGoals[goalKey]?.text || "Unbekanntes Ziel";
+
     const goalButton = document.createElement("button");
     goalButton.textContent = goalName;
-    goalButton.title = "Click to move to the section of " + goalName;
+    goalButton.title = "Klicke, um zum Abschnitt von " + goalName;
+
     goalButton.style.padding = "0.8rem 1.2rem";
     goalButton.style.borderRadius = "6px";
     goalButton.style.cursor = "pointer";
-    goalButton.style.backgroundColor = "rgba(255,255,255,0.2";
+    goalButton.style.backgroundColor = "rgba(255,255,255,0.2)";
     goalButton.style.color = "white";
     goalButton.style.border = "none";
     goalButton.style.transition = "background-color 0.3s";
 
     goalButton.addEventListener("click", () => {
-      document
-        .getElementById(`goal-${goalName}`)
-        .scrollIntoView({ behavior: "smooth" });
+      const goalElement = document.getElementById(`goal-${goalKey}`);
+      const offset = 110;
+
+      const elementPosition =
+        goalElement.getBoundingClientRect().top + window.scrollY;
+      const targetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
     });
 
     goalButton.addEventListener("mouseover", () => {
@@ -167,50 +171,32 @@ function displayVideos(goalVideos) {
       goalButton.style.backgroundColor = "#333";
     });
 
-    // Add click event to scroll to the goal section
-    goalButton.addEventListener("click", () => {
-      const goalElement = document.getElementById(`goal-${goalName}`);
-      const offset = 110; // Adjust this value as needed
-
-      // Calculate the target scroll position
-      const elementPosition =
-        goalElement.getBoundingClientRect().top + window.scrollY;
-      const targetPosition = elementPosition - offset;
-
-      // Scroll to the target position smoothly
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "smooth",
-      });
-    });
-
     buttonContainer.appendChild(goalButton);
   }
 
   primaryElement.appendChild(buttonContainer);
 
-  // Display the videos grouped by goal
   if (Object.keys(goalVideos).length === 0) {
-    primaryElement.innerHTML += "<p>No video recommendations found.</p>";
+    primaryElement.innerHTML += "<p>Keine Videoempfehlungen gefunden.</p>";
     return;
   }
 
   let isFirstGoal = true;
-  for (const [goalName, videos] of Object.entries(goalVideos)) {
-    // Create a section for each goal
+
+  for (const [goalKey, videos] of Object.entries(goalVideos)) {
+    const goalName = storedGoals[goalKey]?.text || "Unbekanntes Ziel";
+
     const goalSection = document.createElement("div");
-    goalSection.id = `goal-${goalName}`;
+    goalSection.id = `goal-${goalKey}`;
     goalSection.style.marginBottom = "2rem";
 
-    // Add goal name as a title
     const goalTitle = document.createElement("h2");
     goalTitle.textContent = goalName;
     goalTitle.style.color = "white";
 
-    // Apply margin-top of 6rem only for the first goal
     if (isFirstGoal) {
       goalTitle.style.marginTop = "6rem";
-      isFirstGoal = false; // Set to false after the first goal
+      isFirstGoal = false;
     } else {
       goalTitle.style.marginTop = "2rem";
     }
@@ -218,7 +204,6 @@ function displayVideos(goalVideos) {
     goalTitle.style.marginBottom = "1rem";
     goalSection.appendChild(goalTitle);
 
-    // Container for videos under the goal
     const videoContainer = document.createElement("div");
     videoContainer.style.display = "flex";
     videoContainer.style.flexWrap = "wrap";
@@ -227,7 +212,6 @@ function displayVideos(goalVideos) {
     videoContainer.style.marginLeft = "1rem";
 
     videos.forEach((video) => {
-      // Individual video card
       const videoElement = document.createElement("div");
       videoElement.style.flex = "1 1 300px";
       videoElement.style.maxWidth = "315px";
