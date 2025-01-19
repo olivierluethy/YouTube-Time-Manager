@@ -1,4 +1,5 @@
 // https://chatgpt.com/share/6786bd5d-087c-8008-be48-4893fe8212f9
+// https://chatgpt.com/share/678d111d-5568-8008-88e9-f9cde3c1df2f
 function searchVideos(goals) {
   if (!goals || goals.length === 0) {
     console.log("Keine Ziele angegeben. Beende die Funktion.");

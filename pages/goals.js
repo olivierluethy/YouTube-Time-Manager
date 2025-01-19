@@ -3,6 +3,11 @@ var goalsList = document.getElementById("goals");
 var goalsTable = document.getElementById("goalsTable");
 const searchInput = document.getElementById("searchGoals");
 
+// Modal selectors
+const close = document.querySelector(".close");
+const dialog = document.getElementById("myModal");
+const closeBtn = document.querySelector(".closeBtn");
+
 const rangeInput = document.querySelector(".goal-range");
 const valueDisplay = document.querySelector(".range-value");
 
@@ -273,10 +278,31 @@ async function generateUniqueID(goal) {
   return `${timestamp}-${randomString}-${hash.substring(0, 16)}`;
 }
 
-function editGoal(row) {
-  // Get the modal
-  var modal = document.getElementById("myModal");
+closeBtn.addEventListener("click", () => {
+  dialog.classList.add("closing"); // Schließ-Animation starten
+  dialog.addEventListener(
+    "animationend",
+    () => {
+      dialog.classList.remove("closing"); // Animation zurücksetzen
+      dialog.close(); // Dialog endgültig schließen
+    },
+    { once: true } // Event-Listener nach einmaliger Ausführung entfernen
+  );
+});
 
+close.addEventListener("click", () => {
+  dialog.classList.add("closing"); // Schließ-Animation starten
+  dialog.addEventListener(
+    "animationend",
+    () => {
+      dialog.classList.remove("closing"); // Animation zurücksetzen
+      dialog.close(); // Dialog endgültig schließen
+    },
+    { once: true } // Event-Listener nach einmaliger Ausführung entfernen
+  );
+});
+
+function editGoal(row) {
   // Get the input fields
   var goalInput = document.getElementById("goalTextEdit");
   var valueInput = document.getElementById("rangeValueEdit");
@@ -292,32 +318,11 @@ function editGoal(row) {
   rangeValueDisplay.textContent = originalValue; // Display range value
 
   // Open the modal
-  modal.style.display = "block";
+  dialog.showModal(); // Dialog öffnen
 
   // Update the displayed value when the slider is moved
   valueInput.oninput = function () {
     rangeValueDisplay.textContent = this.value;
-  };
-
-  // Close button functionality
-  var closeButtons = document.querySelectorAll(".close");
-  closeButtons.forEach(function (button) {
-    button.onclick = function () {
-      modal.style.display = "none";
-    };
-  });
-
-  // Cancel modal functionality
-  var closeBtn = document.querySelector(".closeBtn");
-  closeBtn.onclick = function () {
-    modal.style.display = "none";
-  };
-
-  // Close the modal when clicking outside
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
   };
 
   // Save changes button functionality
@@ -327,7 +332,15 @@ function editGoal(row) {
 
     // Überprüfe, ob sich der Name oder Wert geändert hat
     if (updatedText === originalText && updatedValue === originalValue) {
-      modal.style.display = "none";
+      dialog.classList.add("closing"); // Schließ-Animation starten
+      dialog.addEventListener(
+        "animationend",
+        () => {
+          dialog.classList.remove("closing"); // Animation zurücksetzen
+          dialog.close(); // Dialog endgültig schließen
+        },
+        { once: true } // Event-Listener nach einmaliger Ausführung entfernen
+      );
       return;
     }
 
@@ -362,7 +375,15 @@ function editGoal(row) {
     row.cells[0].textContent = updatedText;
     row.cells[1].textContent = updatedValue;
 
-    modal.style.display = "none";
+    dialog.classList.add("closing"); // Schließ-Animation starten
+    dialog.addEventListener(
+      "animationend",
+      () => {
+        dialog.classList.remove("closing"); // Animation zurücksetzen
+        dialog.close(); // Dialog endgültig schließen
+      },
+      { once: true } // Event-Listener nach einmaliger Ausführung entfernen
+    );
   };
 }
 
@@ -383,22 +404,19 @@ function generatePrompt(goalText, rangeValue) {
   } else if (rangeValue > 25 && rangeValue <= 75) {
     // Advanced-Prompts
     const advancedPrompts = [
-      `Advanced ${goalText} concepts explained`,
+      `${goalText} advanced concepts`,
+      `How to master ${goalText}`,
       `${goalText} in-depth tutorial`,
-      `Mastering ${goalText}: Best practices`,
       `${goalText} advanced techniques`,
-      `${goalText} real-world applications`,
     ];
     prompt =
       advancedPrompts[Math.floor(Math.random() * advancedPrompts.length)];
   } else if (rangeValue > 75 && rangeValue <= 100) {
     // Pro-Prompts
     const proPrompts = [
-      `Pioneering innovations in ${goalText}`,
-      `State-of-the-art ${goalText} methodologies`,
-      `Exploring the future of ${goalText}`,
-      `Theoretical foundations and breakthroughs in ${goalText}`,
-      `Unsolved problems in ${goalText}`,
+      `${goalText} for professionals`,
+      `${goalText} like a pro`,
+      `${goalText} challenges`,
     ];
     prompt = proPrompts[Math.floor(Math.random() * proPrompts.length)];
   }
@@ -514,14 +532,14 @@ function updateSearchVisibility() {
     if (goals.length == 0) {
       document.querySelector(".enter").style.marginTop = "-1rem";
     }
-    if (goals.length == 1) {
+    if (goals.length >= 1 && goals.length < 4) {
       document.querySelector(".enter").style.marginTop = "1rem";
     }
     // Suchfeld wird angezeigt
     if (goals.length >= 4) {
       searchInput.style.display = "block";
       document.querySelector(".table-container").style.marginTop = "2rem";
-    } 
+    }
     // Suchfeld wird ausgeblendet
     else if (goals.length < 4 && goals.length > 1) {
       searchInput.style.display = "none";
@@ -549,6 +567,7 @@ input.addEventListener("keypress", function (event) {
 
 // Function to remove a goal
 function removeGoal(goalText, row) {
+  console.log(goalText, row)
   // Remove the goal from the displayed table
   goalsList.removeChild(row);
 

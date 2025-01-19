@@ -175,10 +175,16 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - YouTube Time Manager (Lasted till then)
 
 ## Links
-Links that I've used to accomplish this extension:
+Links that I've used to accomplish this extension:<br>
+Used for the two sliders when no goals and directly under header
 - https://codepen.io/optimisticweb/pen/oNOBwBq<br>
+How to create a modal popup
 - https://www.w3schools.com/howto/howto_css_modals.asp<br>
-- https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only
+Only bottom box-shadow property used for header
+- https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only<br>
+For the modal animation forth and back
+- https://stackoverflow.com/questions/76708361/how-do-i-css-transition-a-modal-dialog-element-when-it-opens<br>
+- https://codepen.io/Olibaba02/pen/EaYpJmJ
 
 ## Acknowledgements
 

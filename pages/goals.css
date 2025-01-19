@@ -497,145 +497,159 @@ tbody tr:hover {
   -webkit-box-shadow: 0px 0px 15px 0px white;
   -moz-box-shadow: 0px 0px 15px 0px white;
 }
+/* https://chatgpt.com/share/678d303f-f3d0-8008-b60d-744f64b90311 */
 /* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+dialog {
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.7
-  ); /* Darker background for better contrast */
+  width: 100%;
+  height: 100%;
+  padding-top: 100px;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 1;
+  transition: opacity 2s ease-in, background-color 2s ease-in;
 }
 
-/* Modal Content */
-.modal-content {
+dialog .modal-content {
   position: relative;
-  background-color: #ffffff; /* White background for content */
+  background-color: #ffffff;
   margin: auto;
-  padding: 30px; /* Increased padding for better spacing */
-  border: none; /* No border */
-  width: 40%; /* Adjusted width */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Deeper shadow for a more elevated look */
-  border-radius: 10px; /* More rounded corners */
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s;
+  padding: 30px;
+  border: none;
+  width: 40%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
 }
 
-/* Add Animation */
-@-webkit-keyframes animatetop {
-  from {
-    top: -300px;
-    opacity: 0;
-  }
-  to {
-    top: 0;
-    opacity: 1;
-  }
-}
-
-@keyframes animatetop {
-  from {
-    top: -300px;
-    opacity: 0;
-  }
-  to {
-    top: 0;
-    opacity: 1;
-  }
-}
-
-/* Modal Header */
-.modal-header {
+dialog .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
 }
 
-.modal-header h2 {
-  color: #333; /* Darker text for better readability */
-  margin: 0; /* Remove default margin */
+dialog .modal-header h2 {
+  color: #333;
+  margin: 0;
 }
 
-/* The Close Button */
-.close {
+dialog .modal-header .close {
   color: #aaa;
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
 }
 
-.close:hover,
-.close:focus {
+dialog .modal-header .close:hover,
+dialog .modal-header .close:focus {
   color: #000;
 }
 
-/* Button styles */
-.btn,
-.closeBtn {
+dialog .modal-body {
+  padding: 20px 0;
+}
+
+dialog .modal-body label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+dialog .modal-body input[type="text"],
+dialog .modal-body input[type="range"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+dialog .modal-body input[type="range"] {
+  -webkit-appearance: none;
+  height: 5px;
+  background: #ddd;
+  border-radius: 5px;
+}
+
+dialog .modal-body input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #5cb85c;
+  cursor: pointer;
+}
+
+dialog .range-valueEdit {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+dialog .modal-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+dialog .modal-footer .btn,
+dialog .modal-footer .closeBtn {
   background-color: #5cb85c;
   color: white;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin: 5px;
   transition: background-color 0.3s;
 }
 
-.btn:hover,
-.closeBtn:hover {
+dialog .modal-footer .btn:hover,
+dialog .modal-footer .closeBtn:hover {
   background-color: #4cae4c;
 }
 
-/* Input styles */
-.modal-body label {
-  display: block; /* Block display for labels */
-  margin: 10px 0 5px; /* Spacing for labels */
-  font-weight: bold; /* Bold labels */
+/* Animation für das Öffnen */
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 50px;
+    opacity: 1;
+  }
 }
 
-.modal-body input[type="text"],
-.modal-body input[type="range"] {
-  width: 100%; /* Full width for inputs */
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; /* Include padding and border in element's total width and height */
+/* Animation für das Schließen mit Hüpfen */
+@keyframes animatebottom {
+  0% {
+    top: 50px;
+    opacity: 1;
+  }
+  50% {
+    top: 30px; /* Leichter Sprung nach oben */
+    opacity: 1;
+  }
+  100% {
+    top: -300px;
+    opacity: 0;
+  }
 }
 
-.modal-body input[type="range"] {
-  -webkit-appearance: none; /* Remove default styling */
-  height: 5px; /* Height of the slider */
-  background: #ddd; /* Background color of the slider */
-  border-radius: 5px; /* Rounded corners */
+/* Wenn der Dialog geöffnet ist */
+dialog[open] {
+  animation: animatetop 0.5s forwards ease-in-out; /* Animation fürs Öffnen */
 }
 
-.modal-body input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; /* Remove default styling */
-  appearance: none; /* Remove default styling */
-  width: 15px; /* Width of the thumb */
-  height: 15px; /* Height of the thumb */
-  border-radius: 50%; /* Round thumb */
-  background: #5cb85c; /* Green thumb color */
-  cursor: pointer; /* Pointer cursor on hover */
-}
-
-.range-valueEdit {
-  display: block; /* Display the range value below the slider */
-  text-align: center; /* Center the text */
-  margin-top: 10px; /* Spacing above the value */
-  font-weight: bold; /* Bold text for emphasis */
-  color: #333; /* Darker color for better readability */
+/* Animation nur bei Schließen */
+dialog.closing {
+  animation: animatebottom 0.5s forwards ease-in-out; /* Animation fürs Schließen */
 }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Time Manager",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "📽️ **Keep Focused, Stay Productive** Hides video recommendations for a distraction-free YouTube experience.",
   "action": {
     "default_popup": "popup.html"
