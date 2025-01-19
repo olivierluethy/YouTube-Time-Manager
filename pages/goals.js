@@ -231,7 +231,7 @@ function addGoalToList(goalText, rangeValue, date) {
   removeButton.className = "remove-goal";
   removeButton.title = "Remove Goal";
   removeButton.onclick = function () {
-    removeGoal(goalText, row);
+    removeGoal(row);
   };
 
   var editButton = document.createElement("button");
@@ -301,91 +301,6 @@ close.addEventListener("click", () => {
     { once: true } // Event-Listener nach einmaliger Ausführung entfernen
   );
 });
-
-function editGoal(row) {
-  // Get the input fields
-  var goalInput = document.getElementById("goalTextEdit");
-  var valueInput = document.getElementById("rangeValueEdit");
-  var rangeValueDisplay = document.querySelector(".range-valueEdit");
-
-  // Extract current goal values from the row
-  var originalText = row.cells[0].textContent;
-  var originalValue = parseInt(row.cells[1].textContent, 10);
-
-  // Set the current values in the input fields
-  goalInput.value = originalText; // Set goal text
-  valueInput.value = originalValue; // Set range value
-  rangeValueDisplay.textContent = originalValue; // Display range value
-
-  // Open the modal
-  dialog.showModal(); // Dialog öffnen
-
-  // Update the displayed value when the slider is moved
-  valueInput.oninput = function () {
-    rangeValueDisplay.textContent = this.value;
-  };
-
-  // Save changes button functionality
-  document.getElementById("saveChanges").onclick = function () {
-    var updatedText = goalInput.value.trim();
-    var updatedValue = parseInt(valueInput.value, 10);
-
-    // Überprüfe, ob sich der Name oder Wert geändert hat
-    if (updatedText === originalText && updatedValue === originalValue) {
-      dialog.classList.add("closing"); // Schließ-Animation starten
-      dialog.addEventListener(
-        "animationend",
-        () => {
-          dialog.classList.remove("closing"); // Animation zurücksetzen
-          dialog.close(); // Dialog endgültig schließen
-        },
-        { once: true } // Event-Listener nach einmaliger Ausführung entfernen
-      );
-      return;
-    }
-
-    const newPrompt = generatePrompt(updatedText, updatedValue);
-
-    chrome.storage.sync.get("goals", function (data) {
-      var goals = data.goals || [];
-
-      const goalIndex = goals.findIndex((goal) => goal.text === originalText);
-
-      if (goalIndex !== -1) {
-        // Wenn sich der Name geändert hat, entferne den alten Eintrag aus `storedGoals`
-        if (updatedText !== originalText) {
-          chrome.storage.sync.get("doubleGoals", (res) => {
-            let storedGoals = res.doubleGoals || {};
-            delete storedGoals[originalText];
-            chrome.storage.sync.set({ doubleGoals: storedGoals });
-          });
-        }
-
-        // Aktualisiere das Ziel
-        goals[goalIndex].text = updatedText;
-        goals[goalIndex].value = updatedValue;
-        goals[goalIndex].prompt = newPrompt;
-      }
-
-      chrome.storage.sync.set({ goals: goals }, function () {
-        console.log("Updated goals:", goals);
-      });
-    });
-
-    row.cells[0].textContent = updatedText;
-    row.cells[1].textContent = updatedValue;
-
-    dialog.classList.add("closing"); // Schließ-Animation starten
-    dialog.addEventListener(
-      "animationend",
-      () => {
-        dialog.classList.remove("closing"); // Animation zurücksetzen
-        dialog.close(); // Dialog endgültig schließen
-      },
-      { once: true } // Event-Listener nach einmaliger Ausführung entfernen
-    );
-  };
-}
 
 function generatePrompt(goalText, rangeValue) {
   let prompt = ""; // Prompt wird initialisiert
@@ -565,16 +480,103 @@ input.addEventListener("keypress", function (event) {
   }
 });
 
+function editGoal(row) {
+  // Get the input fields
+  var goalInput = document.getElementById("goalTextEdit");
+  var valueInput = document.getElementById("rangeValueEdit");
+  var rangeValueDisplay = document.querySelector(".range-valueEdit");
+
+  // Extract current goal values from the row
+  var originalText = row.cells[0].textContent;
+  var originalValue = parseInt(row.cells[1].textContent, 10);
+
+  // Set the current values in the input fields
+  goalInput.value = originalText; // Set goal text
+  valueInput.value = originalValue; // Set range value
+  rangeValueDisplay.textContent = originalValue; // Display range value
+
+  // Open the modal
+  dialog.showModal(); // Dialog öffnen
+
+  // Update the displayed value when the slider is moved
+  valueInput.oninput = function () {
+    rangeValueDisplay.textContent = this.value;
+  };
+
+  // Save changes button functionality
+  document.getElementById("saveChanges").onclick = function () {
+    var updatedText = goalInput.value.trim();
+    var updatedValue = parseInt(valueInput.value, 10);
+
+    // Überprüfe, ob sich der Name oder Wert geändert hat
+    if (updatedText === originalText && updatedValue === originalValue) {
+      dialog.classList.add("closing"); // Schließ-Animation starten
+      dialog.addEventListener(
+        "animationend",
+        () => {
+          dialog.classList.remove("closing"); // Animation zurücksetzen
+          dialog.close(); // Dialog endgültig schließen
+        },
+        { once: true } // Event-Listener nach einmaliger Ausführung entfernen
+      );
+      return;
+    }
+
+    const newPrompt = generatePrompt(updatedText, updatedValue);
+
+    chrome.storage.sync.get("goals", function (data) {
+      var goals = data.goals || [];
+
+      const goalIndex = goals.findIndex((goal) => goal.text === originalText);
+
+      if (goalIndex !== -1) {
+        // Wenn sich der Name geändert hat, entferne den alten Eintrag aus `storedGoals`
+        if (updatedText !== originalText) {
+          chrome.storage.sync.get("doubleGoals", (res) => {
+            let storedGoals = res.doubleGoals || {};
+            delete storedGoals[originalText];
+            chrome.storage.sync.set({ doubleGoals: storedGoals });
+          });
+        }
+
+        // Aktualisiere das Ziel
+        goals[goalIndex].text = updatedText;
+        goals[goalIndex].value = updatedValue;
+        goals[goalIndex].prompt = newPrompt;
+      }
+
+      chrome.storage.sync.set({ goals: goals }, function () {
+        console.log("Updated goals:", goals);
+      });
+    });
+
+    row.cells[0].textContent = updatedText;
+    row.cells[1].textContent = updatedValue;
+
+    dialog.classList.add("closing"); // Schließ-Animation starten
+    dialog.addEventListener(
+      "animationend",
+      () => {
+        dialog.classList.remove("closing"); // Animation zurücksetzen
+        dialog.close(); // Dialog endgültig schließen
+      },
+      { once: true } // Event-Listener nach einmaliger Ausführung entfernen
+    );
+  };
+}
+
 // Function to remove a goal
-function removeGoal(goalText, row) {
-  console.log(goalText, row)
+function removeGoal(row) {
+  console.log(row);
   // Remove the goal from the displayed table
   goalsList.removeChild(row);
 
   // Remove the goal from Chrome Storage
   chrome.storage.sync.get("goals", function (data) {
     var goals = data.goals || [];
-    goals = goals.filter((goal) => goal.text !== goalText); // Filter out the removed goal
+    // Extract current goal values from the row
+    var originalText = row.cells[0].textContent;
+    goals = goals.filter((goal) => goal.text !== originalText); // Filter out the removed goal
 
     // Save the updated array back to Chrome Storage
     chrome.storage.sync.set({ goals: goals }, function () {
